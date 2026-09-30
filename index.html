@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Sales CRM — Multi-Brand Lead Management</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    /* Subtle professional scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
+
+  <!-- ========================================== -->
+  <!-- 1. AUTH / LOGIN SCREEN (EXECUTIVE MINIMAL)  -->
+  <!-- ========================================== -->
+  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-100/80">
+    <div class="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl p-7 sm:p-8 shadow-sm space-y-6">
+      
+      <!-- Brand Header -->
+      <div class="space-y-1.5">
+        <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-lg mb-3 shadow-xs">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Sign in to Sales Portal</h1>
+        <p class="text-xs text-slate-500">Multi-Brand Telecalling & Lead Management</p>
+      </div>
+
+      <!-- Google Sign In Button -->
+      <button onclick="loginWithGoogle()" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-xs sm:text-sm flex items-center justify-center gap-3 transition cursor-pointer shadow-2xs">
+        <svg class="w-4 h-4" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="relative flex items-center justify-center">
+        <div class="border-t border-slate-200 w-full"></div>
+        <span class="bg-white px-3 text-[11px] text-slate-400 uppercase tracking-wider font-medium absolute">or ID / password</span>
+      </div>
+
+      <!-- ID & Password Form -->
+      <form onsubmit="handleIdLogin(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 mb-1">Work Email / User ID</label>
+          <input type="text" id="loginId" placeholder="name@company.com" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition">
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-medium text-slate-700">Password</label>
+          </div>
+          <input type="password" id="loginPass" placeholder="••••••••" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition">
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition cursor-pointer shadow-xs">
+          Sign In
+        </button>
+      </form>
+
+      <p id="loginError" class="text-xs text-rose-600 text-center font-medium hidden">Invalid credentials. Please select a demo user below.</p>
+
+      <!-- Clean Minimal Quick Demo Switcher -->
+      <div class="pt-3 border-t border-slate-100 space-y-2">
+        <span class="text-[11px] font-medium text-slate-400 block text-center uppercase tracking-wider">Fast Demo Accounts</span>
+        <div class="grid grid-cols-2 gap-1.5 text-xs">
+          <button onclick="quickLogin('admin')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
+            <span class="font-semibold text-slate-900 block text-[11px]">Administrator</span>
+            <span class="text-[10px] text-slate-400">All 6 Brands</span>
+          </button>
+          <button onclick="quickLogin('rahul')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
+            <span class="font-semibold text-slate-900 block text-[11px]">Rahul S.</span>
+            <span class="text-[10px] text-slate-400">C9, Fabia</span>
+          </button>
+          <button onclick="quickLogin('priya')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
+            <span class="font-semibold text-slate-900 block text-[11px]">Priya V.</span>
+            <span class="text-[10px] text-slate-400">Selfi, Dresscode</span>
+          </button>
+          <button onclick="quickLogin('amit')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
+            <span class="font-semibold text-slate-900 block text-[11px]">Amit P.</span>
+            <span class="text-[10px] text-slate-400">Arvind, BS Food</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. MAIN APPLICATION (AUTHENTICATED)        -->
+  <!-- ========================================== -->
+  <div id="appScreen" class="hidden min-h-screen flex flex-col bg-slate-50">
+
+    <!-- Top Executive Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+        
+        <!-- Logo & User Context -->
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
+            SP
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm tracking-tight text-slate-900" id="navTitle">Sales CRM</span>
+              <span id="roleBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-md"></span>
+            </div>
+            <p class="text-[11px] text-slate-500 flex items-center gap-1.5">
+              <span id="userNameDisplay" class="font-medium text-slate-700">User</span>
+              <span>•</span>
+              <span id="userBrandsDisplay" class="text-slate-500 font-normal"></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Center Tabs (Admin Only) -->
+        <div id="adminNavTabs" class="hidden flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-medium">
+          <button onclick="switchAdminTab('overview')" id="tabBtnOverview" class="px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer">Overview</button>
+          <button onclick="switchAdminTab('team')" id="tabBtnTeam" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">Team & Access</button>
+          <button onclick="switchAdminTab('allLeads')" id="tabBtnAllLeads" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">All Leads Pool</button>
+        </div>
+
+        <!-- Right Side: Clock & Logout -->
+        <div class="flex items-center gap-3">
+          <div class="hidden md:flex flex-col items-end text-xs font-mono text-slate-500">
+            <span id="liveClock" class="font-medium text-slate-700">--:--:--</span>
+          </div>
+
+          <button onclick="logout()" class="px-2.5 py-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium text-xs rounded-lg border border-slate-200 transition cursor-pointer">
+            Sign out
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+      <!-- ============================================== -->
+      <!-- VIEW A: EMPLOYEE WORKSPACE (ASSIGNED BRANDS)    -->
+      <!-- ============================================== -->
+      <div id="employeeDashboard" class="space-y-6 hidden">
+        
+        <!-- Assigned Brands Header -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-2xs">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight" id="empGreeting">Welcome, Rahul</h2>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-xs text-slate-500">Assigned Brands:</span>
+              <div id="empBrandBadges" class="inline-flex gap-1.5 flex-wrap"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openWhatsAppModal('emp')" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-2xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              Daily WhatsApp Summary
+            </button>
+          </div>
+        </div>
+
+        <!-- Personal Clean KPI Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Calls Logged</span>
+            <div id="empKpiTotal" class="text-2xl font-bold text-slate-900 mt-1">0</div>
+            <span class="text-[11px] text-slate-400">Assigned leads</span>
+          </div>
+          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Active Pipeline</span>
+            <div id="empKpiActive" class="text-2xl font-bold text-slate-900 mt-1">0</div>
+            <span class="text-[11px] text-slate-400">Interested / Follow-up</span>
+          </div>
+          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Orders Won</span>
+            <div id="empKpiWon" class="text-2xl font-bold text-emerald-600 mt-1">0</div>
+            <span class="text-[11px] text-emerald-600">Converted</span>
+          </div>
+          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Revenue Closed</span>
+            <div id="empKpiRevenue" class="text-2xl font-bold text-slate-900 mt-1">₹0</div>
+            <span class="text-[11px] text-slate-400">Booked value</span>
+          </div>
+        </div>
+
+        <!-- Quick Call Log Form -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-semibold text-slate-900">Log New Call Entry</h3>
+            <span class="text-xs text-slate-400">Date auto-captured in real-time</span>
+          </div>
+
+          <form onsubmit="handleEmpAddLead(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Source for (Brand)</label>
+              <select id="empFormBrand" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none focus:border-slate-900">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Lead Source</label>
+              <select id="empFormSource" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none focus:border-slate-900">
+                <option>TradeIndia</option>
+                <option>Indiamart</option>
+                <option>Website</option>
+                <option>Meta Ads</option>
+                <option>Justdial</option>
+                <option>Referral</option>
+                <option>Cold Call</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Company / Person</label>
+              <input type="text" id="empFormCompany" placeholder="e.g. Modern Garments" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Contact Number</label>
+              <input type="text" id="empFormPhone" placeholder="9811223344" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono outline-none focus:border-slate-900">
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">City</label>
+              <input type="text" id="empFormCity" placeholder="e.g. Surat" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Requirement & Qty</label>
+              <input type="text" id="empFormReq" placeholder="e.g. 150 pcs lot" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Est. Value (₹)</label>
+              <input type="number" id="empFormEstVal" placeholder="35000" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Call Status</label>
+              <select id="empFormStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-900 outline-none focus:border-slate-900">
+                <option>Interested</option>
+                <option>Connected</option>
+                <option>Call Back Later</option>
+                <option>Not Picked / Busy</option>
+                <option>Not Interested</option>
+                <option>Invalid Number</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Order Converted?</label>
+              <select id="empFormConverted" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none focus:border-slate-900">
+                <option value="Pending">Pending</option>
+                <option value="Yes">Yes (Converted)</option>
+                <option value="No">No (Lost)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Next Follow-up Date</label>
+              <input type="date" id="empFormFollowup" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Notes / Lost Reason</label>
+              <input type="text" id="empFormNotes" placeholder="Client feedback notes" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition cursor-pointer shadow-2xs">
+                Save Entry
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+          <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Assigned Leads (My Brands)</h3>
+              <p class="text-xs text-slate-500">Only contacts belonging to your assigned brands are visible</p>
+            </div>
+            <span id="empLeadCount" class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-medium">0 Leads</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
+                  <th class="py-2.5 px-3">Date</th>
+                  <th class="py-2.5 px-3">Brand</th>
+                  <th class="py-2.5 px-3">Source</th>
+                  <th class="py-2.5 px-3">Company / Client</th>
+                  <th class="py-2.5 px-3">Contact</th>
+                  <th class="py-2.5 px-3">City</th>
+                  <th class="py-2.5 px-3">Requirement</th>
+                  <th class="py-2.5 px-3 text-right">Est. (₹)</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3">Converted?</th>
+                  <th class="py-2.5 px-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="empLeadsTableBody" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================== -->
+      <!-- VIEW B: BOSS / MASTER EXECUTIVE DASHBOARD      -->
+      <!-- ============================================== -->
+      <div id="adminDashboard" class="space-y-6 hidden">
+        
+        <!-- Tab 1: OVERVIEW -->
+        <div id="adminTabOverview" class="space-y-6">
+          
+          <!-- Header Banner -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <span class="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Executive Master Dashboard</span>
+              <h2 class="text-xl font-bold tracking-tight text-slate-900 mt-0.5">Enterprise Sales Performance</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Consolidated activity across all 6 brands and active telecallers</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openWhatsAppModal('boss')" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium flex items-center gap-2 transition cursor-pointer shadow-2xs">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Company WhatsApp Report
+              </button>
+              <button onclick="exportAllCSV()" class="px-3 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Export CSV Backup
+              </button>
+            </div>
+          </div>
+
+          <!-- Master KPI Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Calls Logged</span>
+              <div id="bossKpiCalls" class="text-2xl font-bold text-slate-900 mt-1">0</div>
+              <span class="text-[11px] text-slate-400">Team volume</span>
+            </div>
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Deals Won</span>
+              <div id="bossKpiWon" class="text-2xl font-bold text-emerald-600 mt-1">0</div>
+              <span class="text-[11px] text-emerald-600">Closed orders</span>
+            </div>
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Revenue</span>
+              <div id="bossKpiRevenue" class="text-2xl font-bold text-slate-900 mt-1">₹0</div>
+              <span class="text-[11px] text-slate-400">Booked value</span>
+            </div>
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Conversion Rate</span>
+              <div id="bossKpiConvRate" class="text-2xl font-bold text-slate-900 mt-1">0%</div>
+              <span class="text-[11px] text-slate-400">Won / Calls</span>
+            </div>
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs col-span-2 md:col-span-1">
+              <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Active Callers</span>
+              <div id="bossKpiActiveCallers" class="text-2xl font-bold text-slate-900 mt-1">0</div>
+              <span class="text-[11px] text-slate-400">Team members</span>
+            </div>
+          </div>
+
+          <!-- Brand Breakdown Grid (Neutral Corporate styling) -->
+          <div class="space-y-2.5">
+            <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wider">Brand Portfolio Breakdown</h3>
+            <div id="brandCardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Team Leaderboard Table -->
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+              <div>
+                <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Caller Performance Scorecard</h3>
+                <p class="text-xs text-slate-500">Activity and conversion metrics per team member</p>
+              </div>
+              <span class="text-xs text-slate-500 font-medium">Daily Track</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
+                    <th class="py-2.5 px-3">Caller Name</th>
+                    <th class="py-2.5 px-3">Assigned Brands</th>
+                    <th class="py-2.5 px-3 text-center">Calls</th>
+                    <th class="py-2.5 px-3 text-center">Connected</th>
+                    <th class="py-2.5 px-3 text-center">Won</th>
+                    <th class="py-2.5 px-3 text-right">Revenue (₹)</th>
+                    <th class="py-2.5 px-3 text-right">Conversion %</th>
+                  </tr>
+                </thead>
+                <tbody id="teamScorecardBody" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tab 2: TEAM & BRAND MANAGEMENT -->
+        <div id="adminTabTeam" class="space-y-6 hidden">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Left: Add New Telecaller -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+              <h3 class="font-semibold text-sm text-slate-900">Add New Team Member</h3>
+              <form onsubmit="handleCreateUser(event)" class="space-y-3 text-xs">
+                <div>
+                  <label class="block font-medium text-slate-700 mb-1">Full Name</label>
+                  <input type="text" id="newUserName" placeholder="e.g. Manish Sharma" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+                </div>
+                <div>
+                  <label class="block font-medium text-slate-700 mb-1">Login Email / ID</label>
+                  <input type="email" id="newUserEmail" placeholder="manish@company.com" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+                </div>
+                <div>
+                  <label class="block font-medium text-slate-700 mb-1">Initial Password</label>
+                  <input type="text" id="newUserPass" placeholder="••••••••" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+                </div>
+                <div>
+                  <label class="block font-medium text-slate-700 mb-1">Assign Brands</label>
+                  <div class="space-y-1.5 p-2.5 rounded-lg bg-slate-50 border border-slate-200 max-h-40 overflow-y-auto">
+                    <label class="flex items-center gap-2 text-[11px] text-slate-700"><input type="checkbox" name="assignBrand" value="C9 International"> C9 International</label>
+                    <label class="flex items-center gap-2 text-[11px] text-slate-700"><input type="checkbox" name="assignBrand" value="Arvind Industries"> Arvind Industries</label>
+                    <label class="flex items-center gap-2 text-[11px] text-slate-700"><input type="checkbox" name="assignBrand" value="BS Food"> BS Food</label>
+                    <label class="flex items-center gap-2 text-[11px] text-slate-700"><input type="checkbox" name="assignBrand" value="Dresscode Clothing"> Dresscode Clothing</label>
+                    <label class="flex items-center gap-2 text-[11px] text-slate-700"><input type="checkbox" name="assignBrand" value="Fabia"> Fabia</label>
+                    <label class="flex items-center gap-2 text-[11px] text-slate-700"><input type="checkbox" name="assignBrand" value="Selfi Creation"> Selfi Creation</label>
+                  </div>
+                </div>
+                <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium transition cursor-pointer">
+                  Save Account
+                </button>
+              </form>
+            </div>
+
+            <!-- Right: Employees List -->
+            <div class="md:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-semibold text-sm text-slate-900">Active Callers & Brand Permissions</h3>
+                <span class="text-xs text-slate-500">Edit access permissions</span>
+              </div>
+              <div id="usersListContainer" class="space-y-2.5">
+                <!-- Dynamically rendered -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 3: ALL LEADS POOL -->
+        <div id="adminTabAllLeads" class="space-y-6 hidden">
+          
+          <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs flex items-center justify-between">
+            <div>
+              <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Automated Lead Ingestion</h3>
+              <p class="text-xs text-slate-500">Inbound leads from IndiaMART & TradeIndia are auto-routed to the assigned caller</p>
+            </div>
+            <button onclick="simulateIncomingLead()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-lg shadow-2xs transition cursor-pointer flex items-center gap-1.5">
+              <span>+</span> Simulate Inbound Lead
+            </button>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+              <div>
+                <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Consolidated Lead Pool</h3>
+                <p class="text-xs text-slate-500">All registered inquiries across the organization</p>
+              </div>
+              <span id="bossLeadCount" class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-medium">0 Leads</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
+                    <th class="py-2.5 px-3">Date</th>
+                    <th class="py-2.5 px-3">Brand</th>
+                    <th class="py-2.5 px-3">Source</th>
+                    <th class="py-2.5 px-3">Company / Client</th>
+                    <th class="py-2.5 px-3">Contact</th>
+                    <th class="py-2.5 px-3">City</th>
+                    <th class="py-2.5 px-3">Assigned Caller</th>
+                    <th class="py-2.5 px-3 text-right">Est. (₹)</th>
+                    <th class="py-2.5 px-3">Status</th>
+                    <th class="py-2.5 px-3">Won?</th>
+                  </tr>
+                </thead>
+                <tbody id="bossLeadsTableBody" class="divide-y divide-slate-100 text-slate-700">
+                  <!-- Dynamically rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. WHATSAPP REPORT MODAL                   -->
+  <!-- ========================================== -->
+  <div id="waModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-lg space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold text-sm text-slate-900">WhatsApp Daily Summary</h3>
+        <button onclick="closeWhatsAppModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">&times;</button>
+      </div>
+      <textarea id="modalWaText" readonly rows="9" class="w-full font-mono text-xs p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 resize-none outline-none"></textarea>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeWhatsAppModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium cursor-pointer">Cancel</button>
+        <button onclick="copyModalWa()" id="btnModalCopy" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition cursor-pointer">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. CORE JAVASCRIPT LOGIC                   -->
+  <!-- ========================================== -->
+  <script>
+    const ALL_BRANDS = [
+      "C9 International",
+      "Arvind Industries",
+      "BS Food",
+      "Dresscode Clothing",
+      "Fabia",
+      "Selfi Creation"
+    ];
+
+    const INITIAL_USERS = [
+      { id: "admin", name: "Administrator", email: "admin@company.com", pass: "admin123", role: "admin", brands: ALL_BRANDS },
+      { id: "rahul", name: "Rahul Sharma", email: "rahul@company.com", pass: "rahul123", role: "employee", brands: ["C9 International", "Fabia"] },
+      { id: "priya", name: "Priya Verma", email: "priya@company.com", pass: "priya123", role: "employee", brands: ["Selfi Creation", "Dresscode Clothing"] },
+      { id: "amit",  name: "Amit Patel",  email: "amit@company.com",  pass: "amit123",  role: "employee", brands: ["Arvind Industries", "BS Food"] }
+    ];
+
+    const todayDate = new Date().toISOString().slice(0, 10);
+
+    const INITIAL_LEADS = [
+      { id: "L1", date: todayDate, brand: "C9 International", source: "TradeIndia", company: "Sharma Traders", phone: "9876543210", city: "Delhi", req: "Seamless Lingerie & Leggings", qty: 50, est: 35000, status: "Interested", followup: "2026-10-02", converted: "Pending", callerId: "rahul", notes: "Catalog shared" },
+      { id: "L2", date: todayDate, brand: "Fabia", source: "Website", company: "Rajesh Western Wear", phone: "9876501234", city: "Surat", req: "Fabia Tops Lot", qty: 150, est: 45000, status: "Connected", followup: "2026-10-01", converted: "Yes", callerId: "rahul", notes: "Advance received" },
+      { id: "L3", date: todayDate, brand: "Selfi Creation", source: "Indiamart", company: "Ananya Boutique", phone: "9823456781", city: "Jaipur", req: "Designer Kurti Collection", qty: 60, est: 36000, status: "Connected", followup: "2026-10-01", converted: "Yes", callerId: "priya", notes: "Order confirmed" },
+      { id: "L4", date: todayDate, brand: "Dresscode Clothing", source: "Meta Ads", company: "Metro Retailers", phone: "9988776655", city: "Ahmedabad", req: "Formal Shirts", qty: 100, est: 55000, status: "Call Back Later", followup: "2026-10-01", converted: "Pending", callerId: "priya", notes: "Meeting pending" },
+      { id: "L5", date: todayDate, brand: "Arvind Industries", source: "Indiamart", company: "Apex Logistics & Tex", phone: "9811223344", city: "Mumbai", req: "Industrial Denim Fabric", qty: 500, est: 75000, status: "Connected", followup: "2026-10-01", converted: "Yes", callerId: "amit", notes: "Advance received" },
+      { id: "L6", date: todayDate, brand: "BS Food", source: "TradeIndia", company: "Kiran Supermarket", phone: "9765432109", city: "Lucknow", req: "Food Packaging Pouches", qty: 1000, est: 28000, status: "Not Interested", followup: "-", converted: "No", callerId: "amit", notes: "Rate issue" }
+    ];
+
+    let users = JSON.parse(localStorage.getItem("crm_users")) || INITIAL_USERS;
+    let leads = JSON.parse(localStorage.getItem("crm_leads")) || INITIAL_LEADS;
+    let currentUser = JSON.parse(localStorage.getItem("crm_current_user")) || null;
+
+    function saveState() {
+      localStorage.setItem("crm_users", JSON.stringify(users));
+      localStorage.setItem("crm_leads", JSON.stringify(leads));
+      localStorage.setItem("crm_current_user", JSON.stringify(currentUser));
+    }
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const str = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      const el = document.getElementById("liveClock");
+      if (el) el.innerText = str;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function quickLogin(userId) {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        currentUser = user;
+        saveState();
+        renderApp();
+      }
+    }
+
+    function loginWithGoogle() {
+      const promptEmail = prompt("Enter Google Workspace Email:", "rahul@company.com");
+      if (!promptEmail) return;
+
+      let user = users.find(u => u.email.toLowerCase() === promptEmail.toLowerCase());
+      if (!user) {
+        user = {
+          id: "google_" + Date.now(),
+          name: promptEmail.split("@")[0].toUpperCase(),
+          email: promptEmail,
+          pass: "google_auth",
+          role: "employee",
+          brands: ["C9 International", "Fabia"]
+        };
+        users.push(user);
+      }
+      currentUser = user;
+      saveState();
+      renderApp();
+    }
+
+    function handleIdLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginId").value.trim().toLowerCase();
+      const pass = document.getElementById("loginPass").value;
+
+      const user = users.find(u => (u.email.toLowerCase() === email || u.id === email) && u.pass === pass);
+      if (user) {
+        currentUser = user;
+        document.getElementById("loginError").classList.add("hidden");
+        saveState();
+        renderApp();
+      } else {
+        document.getElementById("loginError").classList.remove("hidden");
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem("crm_current_user");
+      renderApp();
+    }
+
+    function renderApp() {
+      const authScreen = document.getElementById("authScreen");
+      const appScreen = document.getElementById("appScreen");
+
+      if (!currentUser) {
+        authScreen.classList.remove("hidden");
+        appScreen.classList.add("hidden");
+        return;
+      }
+
+      authScreen.classList.add("hidden");
+      appScreen.classList.remove("hidden");
+
+      document.getElementById("userNameDisplay").innerText = currentUser.name;
+      const roleBadge = document.getElementById("roleBadge");
+      const adminNavTabs = document.getElementById("adminNavTabs");
+
+      if (currentUser.role === "admin") {
+        roleBadge.innerText = "Admin";
+        roleBadge.className = "text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200";
+        document.getElementById("userBrandsDisplay").innerText = "All Brands";
+        adminNavTabs.classList.remove("hidden");
+        
+        document.getElementById("employeeDashboard").classList.add("hidden");
+        document.getElementById("adminDashboard").classList.remove("hidden");
+        renderAdminDashboard();
+      } else {
+        roleBadge.innerText = "Caller";
+        roleBadge.className = "text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200";
+        document.getElementById("userBrandsDisplay").innerText = currentUser.brands.join(", ");
+        adminNavTabs.classList.add("hidden");
+
+        document.getElementById("adminDashboard").classList.add("hidden");
+        document.getElementById("employeeDashboard").classList.remove("hidden");
+        renderEmployeeDashboard();
+      }
+    }
+
+    // EMPLOYEE DASHBOARD
+    function renderEmployeeDashboard() {
+      document.getElementById("empGreeting").innerText = `Welcome, ${currentUser.name}`;
+      
+      const brandContainer = document.getElementById("empBrandBadges");
+      brandContainer.innerHTML = currentUser.brands.map(b => 
+        `<span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700 border border-slate-200 font-medium">${b}</span>`
+      ).join("");
+
+      const selectEl = document.getElementById("empFormBrand");
+      selectEl.innerHTML = currentUser.brands.map(b => `<option value="${b}">${b}</option>`).join("");
+
+      const myLeads = leads.filter(l => currentUser.brands.includes(l.brand));
+
+      const totalCalls = myLeads.length;
+      const activeCalls = myLeads.filter(l => l.status === "Connected" || l.status === "Interested" || l.status === "Call Back Later").length;
+      const wonCalls = myLeads.filter(l => l.converted === "Yes").length;
+      const wonRevenue = myLeads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+
+      document.getElementById("empKpiTotal").innerText = totalCalls;
+      document.getElementById("empKpiActive").innerText = activeCalls;
+      document.getElementById("empKpiWon").innerText = wonCalls;
+      document.getElementById("empKpiRevenue").innerText = `₹${wonRevenue.toLocaleString('en-IN')}`;
+      document.getElementById("empLeadCount").innerText = `${myLeads.length} Leads`;
+
+      const tbody = document.getElementById("empLeadsTableBody");
+      tbody.innerHTML = "";
+
+      if (myLeads.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400">No leads available for your brands.</td></tr>`;
+        return;
+      }
+
+      myLeads.forEach(l => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50/70 transition";
+        
+        let convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span>`;
+        if (l.converted === "Yes") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Won</span>`;
+        if (l.converted === "No") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Lost</span>`;
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
+          <td class="py-2.5 px-3 font-medium text-slate-900 whitespace-nowrap">${l.brand}</td>
+          <td class="py-2.5 px-3 text-slate-500">${l.source}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900">${l.company}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-600">${l.phone}</td>
+          <td class="py-2.5 px-3 text-slate-500">${l.city}</td>
+          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">${l.req}</td>
+          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${Number(l.est).toLocaleString('en-IN')}</td>
+          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">${l.status}</span></td>
+          <td class="py-2.5 px-3">${convBadge}</td>
+          <td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1">
+            <a href="tel:${l.phone}" class="text-slate-600 hover:text-slate-900 font-medium px-1.5 py-0.5 border border-slate-200 rounded hover:bg-slate-100" title="Call">Call</a>
+            <a href="https://wa.me/91${l.phone.replace(/[^0-9]/g, '')}" target="_blank" class="text-emerald-700 hover:text-emerald-800 font-medium px-1.5 py-0.5 border border-emerald-200 bg-emerald-50 rounded" title="WhatsApp">WA</a>
+            <button onclick="toggleWonLead('${l.id}')" class="text-[11px] px-1.5 py-0.5 rounded border border-slate-200 text-slate-700 hover:bg-slate-100 font-medium cursor-pointer">${l.converted === 'Yes' ? 'Undo' : 'Won'}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function handleEmpAddLead(e) {
+      e.preventDefault();
+      const newLead = {
+        id: "L" + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        brand: document.getElementById("empFormBrand").value,
+        source: document.getElementById("empFormSource").value,
+        company: document.getElementById("empFormCompany").value,
+        phone: document.getElementById("empFormPhone").value,
+        city: document.getElementById("empFormCity").value || "-",
+        req: document.getElementById("empFormReq").value || "General Requirement",
+        qty: 1,
+        est: Number(document.getElementById("empFormEstVal").value || 0),
+        status: document.getElementById("empFormStatus").value,
+        followup: document.getElementById("empFormFollowup").value || "-",
+        converted: document.getElementById("empFormConverted").value,
+        callerId: currentUser.id,
+        notes: document.getElementById("empFormNotes").value || ""
+      };
+
+      leads.unshift(newLead);
+      saveState();
+
+      document.getElementById("empFormCompany").value = "";
+      document.getElementById("empFormPhone").value = "";
+      document.getElementById("empFormCity").value = "";
+      document.getElementById("empFormReq").value = "";
+      document.getElementById("empFormEstVal").value = "";
+      document.getElementById("empFormNotes").value = "";
+
+      renderEmployeeDashboard();
+    }
+
+    function toggleWonLead(leadId) {
+      const lead = leads.find(l => l.id === leadId);
+      if (lead) {
+        lead.converted = lead.converted === "Yes" ? "Pending" : "Yes";
+        saveState();
+        if (currentUser.role === "admin") renderAdminDashboard();
+        else renderEmployeeDashboard();
+      }
+    }
+
+    // ADMIN DASHBOARD
+    function switchAdminTab(tab) {
+      document.getElementById("adminTabOverview").classList.add("hidden");
+      document.getElementById("adminTabTeam").classList.add("hidden");
+      document.getElementById("adminTabAllLeads").classList.add("hidden");
+
+      document.getElementById("tabBtnOverview").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
+      document.getElementById("tabBtnTeam").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
+      document.getElementById("tabBtnAllLeads").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
+
+      if (tab === "overview") {
+        document.getElementById("adminTabOverview").classList.remove("hidden");
+        document.getElementById("tabBtnOverview").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
+      } else if (tab === "team") {
+        document.getElementById("adminTabTeam").classList.remove("hidden");
+        document.getElementById("tabBtnTeam").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
+        renderUsersList();
+      } else if (tab === "allLeads") {
+        document.getElementById("adminTabAllLeads").classList.remove("hidden");
+        document.getElementById("tabBtnAllLeads").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
+        renderBossAllLeads();
+      }
+    }
+
+    function renderAdminDashboard() {
+      const totalCalls = leads.length;
+      const wonDeals = leads.filter(l => l.converted === "Yes").length;
+      const totalRevenue = leads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+      const convRate = totalCalls > 0 ? Math.round((wonDeals / totalCalls) * 100) : 0;
+      const callersCount = users.filter(u => u.role === "employee").length;
+
+      document.getElementById("bossKpiCalls").innerText = totalCalls;
+      document.getElementById("bossKpiWon").innerText = wonDeals;
+      document.getElementById("bossKpiRevenue").innerText = `₹${totalRevenue.toLocaleString('en-IN')}`;
+      document.getElementById("bossKpiConvRate").innerText = `${convRate}%`;
+      document.getElementById("bossKpiActiveCallers").innerText = callersCount;
+
+      // Brand Performance Cards
+      const brandGrid = document.getElementById("brandCardsGrid");
+      brandGrid.innerHTML = "";
+
+      ALL_BRANDS.forEach(b => {
+        const brandLeads = leads.filter(l => l.brand === b);
+        const bRevenue = brandLeads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+        const bWon = brandLeads.filter(l => l.converted === "Yes").length;
+
+        const card = document.createElement("div");
+        card.className = "bg-white border border-slate-200 p-3 rounded-xl shadow-2xs";
+        card.innerHTML = `
+          <div class="text-[11px] font-semibold text-slate-600 truncate" title="${b}">${b}</div>
+          <div class="text-base font-bold text-slate-900 mt-1">₹${bRevenue.toLocaleString('en-IN')}</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">${brandLeads.length} leads (${bWon} won)</div>
+        `;
+        brandGrid.appendChild(card);
+      });
+
+      // Team Scorecard
+      const scoreTbody = document.getElementById("teamScorecardBody");
+      scoreTbody.innerHTML = "";
+
+      const employeeUsers = users.filter(u => u.role === "employee");
+      employeeUsers.forEach(emp => {
+        const empLeads = leads.filter(l => l.callerId === emp.id || emp.brands.includes(l.brand));
+        const eCalls = empLeads.length;
+        const eConnected = empLeads.filter(l => l.status === "Connected" || l.status === "Interested").length;
+        const eWon = empLeads.filter(l => l.converted === "Yes").length;
+        const eRev = empLeads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+        const eRate = eCalls > 0 ? Math.round((eWon / eCalls) * 100) : 0;
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50/70 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-semibold text-slate-900">${emp.name}<br><span class="text-[10px] text-slate-400 font-normal">${emp.email}</span></td>
+          <td class="py-2.5 px-3 text-slate-500">${emp.brands.map(b => `<span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 border border-slate-200 mr-1 font-medium">${b}</span>`).join("")}</td>
+          <td class="py-2.5 px-3 text-center font-semibold text-slate-900">${eCalls}</td>
+          <td class="py-2.5 px-3 text-center text-slate-600">${eConnected}</td>
+          <td class="py-2.5 px-3 text-center text-emerald-600 font-semibold">${eWon}</td>
+          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${eRev.toLocaleString('en-IN')}</td>
+          <td class="py-2.5 px-3 text-right font-medium text-slate-600">${eRate}%</td>
+        `;
+        scoreTbody.appendChild(tr);
+      });
+    }
+
+    function renderUsersList() {
+      const container = document.getElementById("usersListContainer");
+      container.innerHTML = "";
+
+      users.filter(u => u.role === "employee").forEach(u => {
+        const div = document.createElement("div");
+        div.className = "p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3";
+        div.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-xs text-slate-900">${u.name}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${u.email}</span>
+              <span class="text-[10px] text-slate-400 font-mono">pwd: ${u.pass}</span>
+            </div>
+            <div class="flex flex-wrap gap-1 mt-1.5">
+              ${u.brands.map(b => `<span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-white text-slate-700 border border-slate-200">${b}</span>`).join("")}
+            </div>
+          </div>
+          <div>
+            <button onclick="toggleBrandForUser('${u.id}')" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-white border border-slate-300 hover:bg-slate-100 cursor-pointer text-slate-700">
+              Edit Brands
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function handleCreateUser(e) {
+      e.preventDefault();
+      const name = document.getElementById("newUserName").value.trim();
+      const email = document.getElementById("newUserEmail").value.trim();
+      const pass = document.getElementById("newUserPass").value.trim();
+      
+      const checkboxes = document.querySelectorAll('input[name="assignBrand"]:checked');
+      const selectedBrands = Array.from(checkboxes).map(c => c.value);
+
+      if (selectedBrands.length === 0) {
+        alert("Please select at least one brand.");
+        return;
+      }
+
+      const newUser = {
+        id: "emp_" + Date.now(),
+        name,
+        email,
+        pass,
+        role: "employee",
+        brands: selectedBrands
+      };
+
+      users.push(newUser);
+      saveState();
+
+      document.getElementById("newUserName").value = "";
+      document.getElementById("newUserEmail").value = "";
+      document.getElementById("newUserPass").value = "";
+      checkboxes.forEach(c => c.checked = false);
+
+      alert(`Caller account for ${name} created.`);
+      renderUsersList();
+    }
+
+    function toggleBrandForUser(userId) {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+      const brandChoices = prompt(`Assigned brands for ${user.name}:\nAvailable: ${ALL_BRANDS.join(", ")}\n\nEnter comma-separated:`, user.brands.join(", "));
+      if (brandChoices !== null) {
+        user.brands = brandChoices.split(",").map(b => b.trim()).filter(b => ALL_BRANDS.includes(b));
+        saveState();
+        renderUsersList();
+      }
+    }
+
+    function renderBossAllLeads() {
+      const tbody = document.getElementById("bossLeadsTableBody");
+      tbody.innerHTML = "";
+      document.getElementById("bossLeadCount").innerText = `${leads.length} Leads`;
+
+      leads.forEach(l => {
+        const caller = users.find(u => u.id === l.callerId) || { name: "Auto-Assigned" };
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50/70 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">${l.brand}</td>
+          <td class="py-2.5 px-3 text-slate-500">${l.source}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900">${l.company}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-600">${l.phone}</td>
+          <td class="py-2.5 px-3 text-slate-500">${l.city}</td>
+          <td class="py-2.5 px-3 text-slate-700 font-medium">${caller.name}</td>
+          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${Number(l.est).toLocaleString('en-IN')}</td>
+          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">${l.status}</span></td>
+          <td class="py-2.5 px-3 font-semibold ${l.converted === 'Yes' ? 'text-emerald-600' : 'text-slate-500'}">${l.converted}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function simulateIncomingLead() {
+      const randomBrands = ["Fabia", "C9 International", "Selfi Creation", "Arvind Industries", "BS Food", "Dresscode Clothing"];
+      const randomSources = ["TradeIndia", "Indiamart"];
+      const brand = randomBrands[Math.floor(Math.random() * randomBrands.length)];
+      const source = randomSources[Math.floor(Math.random() * randomSources.length)];
+      
+      const eligibleEmployee = users.find(u => u.role === "employee" && u.brands.includes(brand)) || users[1];
+
+      const newLead = {
+        id: "L_SIM_" + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        brand: brand,
+        source: source,
+        company: "Enterprise Buyer (" + Math.floor(1000 + Math.random() * 9000) + ")",
+        phone: "98" + Math.floor(10000000 + Math.random() * 90000000),
+        city: "Delhi/NCR",
+        req: "Bulk Purchase of " + brand,
+        qty: 100,
+        est: Math.floor(15 + Math.random() * 80) * 1000,
+        status: "Interested",
+        followup: "-",
+        converted: "Pending",
+        callerId: eligibleEmployee.id,
+        notes: "Real-time API Inbound Lead"
+      };
+
+      leads.unshift(newLead);
+      saveState();
+      alert(`⚡ Inbound ${source} Lead Received:\nBrand: ${brand}\nAssigned To: ${eligibleEmployee.name}`);
+      renderBossAllLeads();
+    }
+
+    function openWhatsAppModal(type) {
+      const modal = document.getElementById("waModal");
+      const textarea = document.getElementById("modalWaText");
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+      let text = "";
+
+      if (type === "emp") {
+        const myLeads = leads.filter(l => currentUser.brands.includes(l.brand));
+        const total = myLeads.length;
+        const won = myLeads.filter(l => l.converted === "Yes").length;
+        const rev = myLeads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+        const pending = myLeads.filter(l => l.converted === "Pending").length;
+
+        text = `*DAILY CALLER SUMMARY — ${currentUser.name}*\n` +
+          `Date: ${dateStr} (${timeStr})\n` +
+          `Assigned Brands: ${currentUser.brands.join(", ")}\n` +
+          `------------------------------------\n` +
+          `Calls Logged: ${total}\n` +
+          `Orders Closed: ${won}\n` +
+          `Booked Value: ₹${rev.toLocaleString('en-IN')}\n` +
+          `Active Follow-ups: ${pending}\n` +
+          `------------------------------------`;
+      } else {
+        const total = leads.length;
+        const won = leads.filter(l => l.converted === "Yes").length;
+        const rev = leads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+        
+        let brandSummary = "";
+        ALL_BRANDS.forEach(b => {
+          const bRev = leads.filter(l => l.brand === b && l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+          brandSummary += `• ${b}: ₹${bRev.toLocaleString('en-IN')}\n`;
+        });
+
+        text = `*COMPANY EXECUTIVE SALES REPORT*\n` +
+          `Date: ${dateStr} (${timeStr})\n` +
+          `------------------------------------\n` +
+          `Total Calls Made: ${total}\n` +
+          `Total Deals Won: ${won}\n` +
+          `Total Revenue: ₹${rev.toLocaleString('en-IN')}\n` +
+          `------------------------------------\n` +
+          `Brand Breakdown:\n${brandSummary}` +
+          `------------------------------------`;
+      }
+
+      textarea.value = text;
+      modal.classList.remove("hidden");
+    }
+
+    function closeWhatsAppModal() {
+      document.getElementById("waModal").classList.add("hidden");
+    }
+
+    function copyModalWa() {
+      const copyText = document.getElementById("modalWaText");
+      copyText.select();
+      navigator.clipboard.writeText(copyText.value);
+      const btn = document.getElementById("btnModalCopy");
+      btn.innerText = "Copied!";
+      setTimeout(() => { btn.innerText = "Copy to Clipboard"; }, 2000);
+    }
+
+    function exportAllCSV() {
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Date,Brand,Lead Source,Company/Person,Contact Number,City,Requirement,Qty,Est. Value (INR),Call Status,Next Follow-up,Order Converted?,Caller Name,Notes\n";
+
+      leads.forEach(l => {
+        const caller = users.find(u => u.id === l.callerId) || { name: "N/A" };
+        csvContent += `"${l.date}","${l.brand}","${l.source}","${l.company}","${l.phone}","${l.city}","${l.req}",${l.qty},${l.est},"${l.status}","${l.followup}","${l.converted}","${caller.name}","${l.notes}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `master_sales_crm_backup_${todayDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    renderApp();
+  </script>
+</body>
+</html>
