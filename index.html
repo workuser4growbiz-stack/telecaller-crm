@@ -143,7 +143,7 @@
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
 
       <!-- ============================================================== -->
-      <!-- VIEW A: EMPLOYEE WORKSPACE (SMART PASTE & CLICK-TO-WHATSAPP)   -->
+      <!-- VIEW A: EMPLOYEE WORKSPACE (SMART PARSER & CLEAN LEADS)        -->
       <!-- ============================================================== -->
       <div id="employeeDashboard" class="space-y-6 hidden">
         
@@ -165,19 +165,19 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- 🌟 SMART MAGIC PASTE BOX (INDIAMART / TRADEINDIA / BUYLEAD) -->
+        <!-- 🌟 SMART LEAD EXTRACTOR (CLEAN AUTO-PARSING ENGINE)       -->
         <!-- ========================================================= -->
         <div class="bg-white border-2 border-indigo-100 rounded-xl p-5 shadow-xs space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
             <div>
               <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <span class="p-1 rounded-md bg-indigo-50 text-indigo-700 text-xs">⚡ Fast Lead Entry</span>
-                <span>IndiaMART / TradeIndia Smart Paste Box</span>
+                <span class="p-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold">⚡ Smart Paste</span>
+                <span>IndiaMART / TradeIndia Lead Extractor</span>
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">IndiaMART ya TradeIndia se copy kiya hua poora text yahan paste karein — Name, Number aur City automatic alag ho jayenge!</p>
+              <p class="text-xs text-slate-500 mt-0.5">Yahan raw text paste karein — System Date, Mobile Number, Client Name aur Requirement ko alag-alag clean karega!</p>
             </div>
             <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-200">
-              <span class="text-[11px] font-medium text-slate-500 px-1">Lead Type:</span>
+              <span class="text-[11px] font-medium text-slate-500 px-1">Type:</span>
               <label class="flex items-center gap-1 text-xs cursor-pointer px-2 py-0.5 rounded bg-white font-medium border border-slate-200 text-slate-800">
                 <input type="radio" name="empLeadType" value="Direct Enquiry" checked> Direct Enquiry
               </label>
@@ -191,30 +191,53 @@
             
             <!-- Paste Text Area -->
             <div class="md:col-span-2 space-y-2">
-              <textarea id="smartPasteText" rows="4" placeholder="IndiaMART / TradeIndia se copy kiya hua message yahan Ctrl + V karein...&#10;Example:&#10;Buyer Name: Rajesh Kumar, Mobile: 9876543210, City: Surat, Product: 100 pcs Western Tops" class="w-full p-3 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:border-slate-900 focus:bg-white resize-none transition font-mono"></textarea>
+              <textarea id="smartPasteText" rows="4" oninput="autoParseLeadText()" placeholder="IndiaMART / TradeIndia se copy kiya hua text yahan paste karein...&#10;Jaise: 2026-09-29 08800008896 Aadit Kohli Oversized T-shirts Delhi" class="w-full p-3 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:border-slate-900 focus:bg-white resize-none transition font-mono"></textarea>
               <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400 text-[11px]">System phone number aur name automatic nikal lega</span>
+                <span class="text-slate-400 text-[11px]">Paste karte hi right side me clean fields auto-fill ho jayengi</span>
                 <button type="button" onclick="autoParseLeadText()" class="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium text-xs cursor-pointer transition">
-                  ⚡ Auto-Extract Details
+                  Re-Extract Clean Data
                 </button>
               </div>
             </div>
 
-            <!-- Extracted Controls & Save -->
+            <!-- Extracted Clean Controls -->
             <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5 text-xs">
               <div class="flex items-center justify-between font-semibold text-slate-700">
-                <span>Extracted Preview</span>
-                <span id="quickStatusTag" class="text-[10px] text-emerald-600 font-bold hidden">Ready to Save</span>
+                <span>Clean Data Preview</span>
+                <span id="quickStatusTag" class="text-[10px] text-emerald-600 font-bold hidden">Cleaned</span>
               </div>
 
-              <div>
-                <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Brand</label>
-                <select id="smartFormBrand" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
-                  <!-- Populated with employee's assigned brands -->
-                </select>
+              <!-- Date & Brand in One Row -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Date</label>
+                  <input type="text" id="smartFormDate" readonly class="w-full px-2 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Brand</label>
+                  <select id="smartFormBrand" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- Name & Phone (Cleaned - No Date, No Phone in Name!) -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Client / Person Name</label>
+                  <input type="text" id="smartFormName" placeholder="Client Name" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Contact Number</label>
+                  <input type="text" id="smartFormPhone" placeholder="10 Digits" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 outline-none">
+                </div>
               </div>
 
               <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">City</label>
+                  <input type="text" id="smartFormCity" placeholder="City" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
+                </div>
                 <div>
                   <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Source</label>
                   <select id="smartFormSource" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
@@ -225,30 +248,15 @@
                     <option>Cold Call</option>
                   </select>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Client Name</label>
-                  <input type="text" id="smartFormName" placeholder="Client Name" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none font-medium">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Phone Number</label>
-                  <input type="text" id="smartFormPhone" placeholder="Mobile" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-medium outline-none">
-                </div>
-                <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">City</label>
-                  <input type="text" id="smartFormCity" placeholder="City" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
-                </div>
               </div>
 
               <div>
-                <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Requirement</label>
+                <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Requirement (Clean)</label>
                 <input type="text" id="smartFormReq" placeholder="Product requirement" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
               </div>
 
               <button type="button" onclick="saveSmartParsedLead()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs transition cursor-pointer shadow-xs">
-                + Save Lead & Send WhatsApp
+                + Save Clean Lead & Send WA
               </button>
             </div>
 
@@ -279,12 +287,12 @@
           </div>
         </div>
 
-        <!-- Leads Table with 1-Click WhatsApp & BuyLead Tags -->
+        <!-- Clean Leads Table with Separated Columns -->
         <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
           <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
-              <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">My Active Leads (Assigned Brands)</h3>
-              <p class="text-xs text-slate-500">Click WA to send instant intro message with pre-saved template</p>
+              <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">My Active Leads (Clean Display)</h3>
+              <p class="text-xs text-slate-500">Company Name, Contact, and Requirements are separated into their exact columns</p>
             </div>
             <span id="empLeadCount" class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-medium">0 Leads</span>
           </div>
@@ -296,18 +304,18 @@
                   <th class="py-2.5 px-3">Date</th>
                   <th class="py-2.5 px-3">Brand</th>
                   <th class="py-2.5 px-3">Source & Type</th>
-                  <th class="py-2.5 px-3">Company / Client</th>
-                  <th class="py-2.5 px-3">Contact</th>
+                  <th class="py-2.5 px-3 font-semibold text-slate-900">Client / Company Name</th>
+                  <th class="py-2.5 px-3 font-semibold text-slate-900">Contact Number</th>
                   <th class="py-2.5 px-3">City</th>
-                  <th class="py-2.5 px-3">Requirement</th>
+                  <th class="py-2.5 px-3 font-semibold text-slate-900">Requirement</th>
                   <th class="py-2.5 px-3 text-right">Est. (₹)</th>
                   <th class="py-2.5 px-3">Status</th>
                   <th class="py-2.5 px-3">Converted?</th>
-                  <th class="py-2.5 px-3 text-center">Instant WhatsApp & Call</th>
+                  <th class="py-2.5 px-3 text-center">Action</th>
                 </tr>
               </thead>
               <tbody id="empLeadsTableBody" class="divide-y divide-slate-100 text-slate-700">
-                <!-- Dynamically rendered -->
+                <!-- Rendered dynamically -->
               </tbody>
             </table>
           </div>
@@ -322,8 +330,6 @@
         
         <!-- Tab 1: OVERVIEW -->
         <div id="adminTabOverview" class="space-y-6">
-          
-          <!-- Header Banner -->
           <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <span class="text-[11px] font-semibold tracking-wider text-slate-500 uppercase">Executive Master Dashboard</span>
@@ -377,9 +383,7 @@
           <!-- Brand Breakdown Grid -->
           <div class="space-y-2.5">
             <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wider">Brand Portfolio Breakdown</h3>
-            <div id="brandCardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-              <!-- Dynamically populated -->
-            </div>
+            <div id="brandCardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3"></div>
           </div>
 
           <!-- Team Leaderboard Table -->
@@ -404,9 +408,7 @@
                     <th class="py-2.5 px-3 text-right">Conversion %</th>
                   </tr>
                 </thead>
-                <tbody id="teamScorecardBody" class="divide-y divide-slate-100 text-slate-700">
-                  <!-- Dynamically rendered -->
-                </tbody>
+                <tbody id="teamScorecardBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
               </table>
             </div>
           </div>
@@ -864,131 +866,174 @@
       }
     }
 
-    // ==========================================
-    // EMPLOYEE DASHBOARD & SMART PASTE ENGINE
-    // ==========================================
-    function renderEmployeeDashboard() {
-      document.getElementById("empGreeting").innerText = `Welcome, ${currentUser.name}`;
-      
-      const brandContainer = document.getElementById("empBrandBadges");
-      brandContainer.innerHTML = currentUser.brands.map(b => 
-        `<span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700 border border-slate-200 font-medium">${b}</span>`
-      ).join("");
-
-      // Populate brand selector in smart box
-      const selectEl = document.getElementById("smartFormBrand");
-      selectEl.innerHTML = currentUser.brands.map(b => `<option value="${b}">${b}</option>`).join("");
-
-      // Filter leads: Either directly assigned to this caller OR belonging to caller's assigned brand
-      const myLeads = leads.filter(l => l.callerId === currentUser.id || currentUser.brands.includes(l.brand));
-
-      const totalCalls = myLeads.length;
-      const buyLeadsCount = myLeads.filter(l => l.leadType === "BuyLead").length;
-      const wonCalls = myLeads.filter(l => l.converted === "Yes").length;
-      const wonRevenue = myLeads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
-
-      document.getElementById("empKpiTotal").innerText = totalCalls;
-      document.getElementById("empKpiBuyLeads").innerText = `${buyLeadsCount} BuyLeads`;
-      document.getElementById("empKpiWon").innerText = wonCalls;
-      document.getElementById("empKpiRevenue").innerText = `₹${wonRevenue.toLocaleString('en-IN')}`;
-      document.getElementById("empLeadCount").innerText = `${myLeads.length} Leads`;
-
-      const tbody = document.getElementById("empLeadsTableBody");
-      tbody.innerHTML = "";
-
-      if (myLeads.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400">No leads available for your brands.</td></tr>`;
-        return;
-      }
-
-      myLeads.forEach(l => {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50/70 transition";
-        
-        let typeBadge = l.leadType === "BuyLead" 
-          ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">BuyLead</span>`
-          : `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Enquiry</span>`;
-
-        let convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span>`;
-        if (l.converted === "Yes") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Won</span>`;
-        if (l.converted === "No") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Lost</span>`;
-
-        tr.innerHTML = `
-          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
-          <td class="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">${l.brand}</td>
-          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.source} ${typeBadge}</td>
-          <td class="py-2.5 px-3 font-semibold text-slate-900">${l.company}</td>
-          <td class="py-2.5 px-3 font-mono text-slate-700 font-medium">${l.phone}</td>
-          <td class="py-2.5 px-3 text-slate-500">${l.city}</td>
-          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">${l.req}</td>
-          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${Number(l.est).toLocaleString('en-IN')}</td>
-          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">${l.status}</span></td>
-          <td class="py-2.5 px-3">${convBadge}</td>
-          <td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1.5">
-            <!-- 1-CLICK WHATSAPP WITH TEMPLATE -->
-            <button onclick="sendCustomerWhatsApp('${l.id}')" class="text-xs px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium shadow-2xs inline-flex items-center gap-1 cursor-pointer" title="Direct WhatsApp with Brand Template">
-              <span>💬</span> Send WA
-            </button>
-            <a href="tel:${l.phone}" class="text-xs px-2 py-1 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-medium inline-block" title="Call Customer">Call</a>
-            <button onclick="toggleWonLead('${l.id}')" class="text-[11px] px-1.5 py-1 rounded border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium cursor-pointer">${l.converted === 'Yes' ? 'Undo' : 'Won'}</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // AUTO PARSE COPIED INDIAMART / TRADEINDIA TEXT
+    // ==============================================================
+    // ADVANCED SMART PARSER ENGINE (FIXES USER'S EXACT FORMAT ISSUE)
+    // ==============================================================
     function autoParseLeadText() {
-      const raw = document.getElementById("smartPasteText").value.trim();
-      if (!raw) {
-        alert("Pehle text box me IndiaMART ya TradeIndia se copy kiya hua message paste karein!");
-        return;
-      }
+      let raw = document.getElementById("smartPasteText").value.trim();
+      if (!raw) return;
 
-      // Detect Phone Number (10 digits)
-      const phoneMatch = raw.match(/(\+91[\-\s]?)?[6-9]\d{9}/);
+      // 1. EXTRACT DATE (e.g. 2026-09-29 or 29-09-2026)
+      let detectedDate = todayDate;
+      const dateMatch = raw.match(/\b(\d{4}[-/]\d{2}[-/]\d{2}|\d{2}[-/]\d{2}[-/]\d{4})\b/);
+      if (dateMatch) {
+        detectedDate = dateMatch[0];
+        // Remove date from raw text to prevent it from leaking into Name or Requirement
+        raw = raw.replace(dateMatch[0], ' ').trim();
+      }
+      document.getElementById("smartFormDate").value = detectedDate;
+
+      // 2. EXTRACT PHONE NUMBER (10 or 11 digits, with optional leading 0 or +91)
+      let detectedPhone = "";
+      const phoneMatch = raw.match(/(?:\+91[\-\s]?)?0?([6-9]\d{9})\b/);
       if (phoneMatch) {
-        const cleanPhone = phoneMatch[0].replace(/[^0-9]/g, '').slice(-10);
-        document.getElementById("smartFormPhone").value = cleanPhone;
+        detectedPhone = phoneMatch[1]; // grabs exact 10 digits
+        // Remove the entire phone token from raw text
+        raw = raw.replace(phoneMatch[0], ' ').trim();
+      } else {
+        // Fallback for any sequence of 10 digits
+        const numMatch = raw.match(/\b\d{10,11}\b/);
+        if (numMatch) {
+          detectedPhone = numMatch[0].slice(-10);
+          raw = raw.replace(numMatch[0], ' ').trim();
+        }
+      }
+      document.getElementById("smartFormPhone").value = detectedPhone;
+
+      // 3. EXTRACT CITY IF KNOWN INDIAN CITIES ARE PRESENT
+      const commonCities = ["Delhi", "Surat", "Mumbai", "Jaipur", "Ahmedabad", "Lucknow", "Kolkata", "Bangalore", "Pune", "Indore", "Kanpur", "Nagpur", "Agra", "Ludhiana", "Noida", "Gurgaon", "Faridabad", "Ghaziabad", "Hyderabad", "Chennai"];
+      let detectedCity = "-";
+      for (const city of commonCities) {
+        const cityRegex = new RegExp(`\\b${city}\\b`, 'i');
+        if (cityRegex.test(raw)) {
+          detectedCity = city;
+          raw = raw.replace(cityRegex, ' ').trim();
+          break;
+        }
+      }
+      document.getElementById("smartFormCity").value = detectedCity;
+
+      // 4. DETECT EXPLICIT LABELS (IF AVAILABLE IN MULTILINE FORMAT)
+      let detectedName = "";
+      let detectedReq = "";
+
+      const nameLabelMatch = raw.match(/(?:Buyer Name|Name|Sender|Contact Person|Customer)[\s:]+([^\r\n,]+)/i);
+      const reqLabelMatch = raw.match(/(?:Product|Requirement|Details|Enquiry|Looking for)[\s:]+([^\r\n]+)/i);
+
+      if (nameLabelMatch) {
+        detectedName = nameLabelMatch[1].trim();
+        raw = raw.replace(nameLabelMatch[0], ' ').trim();
       }
 
-      // Detect Name
-      const nameMatch = raw.match(/(?:Buyer Name|Name|Sender|Contact Person|Customer)[\s:]+([A-Za-z\s\.]+)/i);
-      if (nameMatch) {
-        document.getElementById("smartFormName").value = nameMatch[1].trim();
-      } else {
-        // Fallback: First line or first words
-        const lines = raw.split(/\r?\n/).filter(l => l.trim().length > 0);
-        if (lines.length > 0 && !lines[0].includes("http")) {
-          document.getElementById("smartFormName").value = lines[0].slice(0, 30).trim();
+      if (reqLabelMatch) {
+        detectedReq = reqLabelMatch[1].trim();
+        raw = raw.replace(reqLabelMatch[0], ' ').trim();
+      }
+
+      // 5. UNSTRUCTURED SINGLE-LINE PARSER (e.g. "Aadit Kohli Oversized T-shirts...")
+      if (!detectedName || !detectedReq) {
+        // Clean multiple spaces
+        const cleanTokens = raw.replace(/\s+/g, ' ').trim().split(' ').filter(t => t.length > 0);
+
+        if (cleanTokens.length > 0) {
+          const productKeywords = [
+            "oversized", "shirt", "shirts", "t-shirt", "t-shirts", "tshirt", "tshirts", "trouser", "trousers", "formal", "casual", "jeans", "pant", "pants",
+            "kurti", "kurtis", "kurta", "rayon", "ethnic", "anarkali", "palazzo", "dupatta",
+            "top", "tops", "tunic", "tunics", "western", "dress", "dresses", "co-ord",
+            "lingerie", "bra", "panty", "seamless", "legging", "leggings", "innerwear",
+            "denim", "fabric", "fabrics", "cotton", "textile", "textiles", "shirting", "suiting", "yarn",
+            "food", "spice", "spices", "makhana", "pouch", "pouches", "grocery", "packaging", "rice",
+            "enquiry", "inquiry", "requirement", "looking", "need", "wanted", "wholesale", "quantity", "pcs", "piece", "pieces"
+          ];
+
+          // Find first token that matches a product keyword
+          let splitIdx = -1;
+          for (let i = 0; i < cleanTokens.length; i++) {
+            const tokenClean = cleanTokens[i].toLowerCase().replace(/[^a-z\-]/g, '');
+            if (productKeywords.includes(tokenClean)) {
+              splitIdx = i;
+              break;
+            }
+          }
+
+          if (splitIdx > 0) {
+            // Words before product keyword = Name
+            detectedName = cleanTokens.slice(0, splitIdx).join(' ');
+            // Words from product keyword onwards = Requirement
+            detectedReq = cleanTokens.slice(splitIdx).join(' ');
+          } else if (cleanTokens.length >= 3) {
+            // Fallback: First 2 words as Name, rest as Requirement
+            detectedName = cleanTokens.slice(0, 2).join(' ');
+            detectedReq = cleanTokens.slice(2).join(' ');
+          } else if (cleanTokens.length >= 2) {
+            detectedName = cleanTokens.slice(0, 1).join(' ');
+            detectedReq = cleanTokens.slice(1).join(' ');
+          } else {
+            detectedName = cleanTokens[0];
+            detectedReq = "Wholesale Requirement";
+          }
         }
       }
 
-      // Detect City
-      const cityMatch = raw.match(/(?:City|Location|Address|State)[\s:]+([A-Za-z\s]+)/i);
-      if (cityMatch) {
-        document.getElementById("smartFormCity").value = cityMatch[1].trim();
+      // Clean up Name: Strip any stray numbers or symbols
+      detectedName = detectedName.replace(/[0-9\-_:;]/g, '').trim();
+      if (!detectedName) detectedName = "Direct Buyer";
+
+      // Clean up Requirement: Strip redundant info
+      detectedReq = detectedReq.trim();
+      if (!detectedReq) detectedReq = "Product Wholesale Inquiry";
+
+      document.getElementById("smartFormName").value = detectedName;
+      document.getElementById("smartFormReq").value = detectedReq;
+
+      // 6. BRAND AUTO-MATCH FROM CLEAN REQUIREMENT
+      const reqLower = detectedReq.toLowerCase();
+      let matchedBrand = "";
+
+      if (reqLower.includes("oversized") || reqLower.includes("shirt") || reqLower.includes("t-shirt") || reqLower.includes("trouser") || reqLower.includes("formal") || reqLower.includes("suit")) {
+        matchedBrand = "Dresscode Clothing";
+      } else if (reqLower.includes("kurti") || reqLower.includes("kurta") || reqLower.includes("rayon") || reqLower.includes("ethnic") || reqLower.includes("anarkali")) {
+        matchedBrand = "Selfi Creation";
+      } else if (reqLower.includes("top") || reqLower.includes("tunic") || reqLower.includes("western") || reqLower.includes("dress") || reqLower.includes("co-ord") || reqLower.includes("fabia")) {
+        matchedBrand = "Fabia";
+      } else if (reqLower.includes("lingerie") || reqLower.includes("bra") || reqLower.includes("panty") || reqLower.includes("seamless") || reqLower.includes("legging") || reqLower.includes("innerwear")) {
+        matchedBrand = "C9 International";
+      } else if (reqLower.includes("denim") || reqLower.includes("fabric") || reqLower.includes("cotton") || reqLower.includes("textile") || reqLower.includes("shirting")) {
+        matchedBrand = "Arvind Industries";
+      } else if (reqLower.includes("food") || reqLower.includes("spice") || reqLower.includes("makhana") || reqLower.includes("pouch") || reqLower.includes("grocery") || reqLower.includes("rice")) {
+        matchedBrand = "BS Food";
       }
 
-      // Detect Requirement
-      const reqMatch = raw.match(/(?:Product|Requirement|Details|Enquiry|Looking for)[\s:]+([^\r\n]+)/i);
-      if (reqMatch) {
-        document.getElementById("smartFormReq").value = reqMatch[1].trim();
-      } else {
-        document.getElementById("smartFormReq").value = raw.slice(0, 50).trim();
+      // If matched brand is in dropdown, select it. If not in caller's brands, add it dynamically so it's not miscategorized!
+      const brandDropdown = document.getElementById("smartFormBrand");
+      if (matchedBrand) {
+        let found = false;
+        for (let i = 0; i < brandDropdown.options.length; i++) {
+          if (brandDropdown.options[i].value === matchedBrand) {
+            brandDropdown.selectedIndex = i;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          const opt = document.createElement("option");
+          opt.value = matchedBrand;
+          opt.text = `${matchedBrand} (Auto-detected)`;
+          brandDropdown.add(opt);
+          brandDropdown.value = matchedBrand;
+        }
       }
 
-      // Auto detect source
-      if (raw.toLowerCase().includes("indiamart")) {
-        document.getElementById("smartFormSource").value = "Indiamart";
-      } else if (raw.toLowerCase().includes("tradeindia")) {
-        document.getElementById("smartFormSource").value = "TradeIndia";
-      }
+      // Auto detect source if mentioned
+      const fullLower = document.getElementById("smartPasteText").value.toLowerCase();
+      if (fullLower.includes("indiamart")) document.getElementById("smartFormSource").value = "Indiamart";
+      else if (fullLower.includes("tradeindia")) document.getElementById("smartFormSource").value = "TradeIndia";
 
       document.getElementById("quickStatusTag").classList.remove("hidden");
     }
 
     function saveSmartParsedLead() {
+      const date = document.getElementById("smartFormDate").value || todayDate;
       const company = document.getElementById("smartFormName").value.trim() || "Customer Lead";
       const phone = document.getElementById("smartFormPhone").value.trim();
       const city = document.getElementById("smartFormCity").value.trim() || "-";
@@ -999,34 +1044,34 @@
       const leadTypeRadio = document.querySelector('input[name="empLeadType"]:checked');
       const leadType = leadTypeRadio ? leadTypeRadio.value : "Direct Enquiry";
 
-      if (!phone) {
-        alert("Kripya customer ka mobile number zaroor check karein!");
+      if (!phone || phone.length < 10) {
+        alert("Kripya customer ka 10-digit mobile number zaroor check karein!");
         return;
       }
 
       const newLead = {
         id: "L_" + Date.now(),
-        date: todayDate,
-        brand,
-        source,
-        leadType,
-        company,
-        phone,
-        city,
-        req,
+        date: date,
+        brand: brand,
+        source: source,
+        leadType: leadType,
+        company: company,
+        phone: phone,
+        city: city,
+        req: req,
         qty: 1,
         est: 25000,
         status: "Interested",
         followup: "-",
         converted: "Pending",
         callerId: currentUser.id,
-        notes: `Logged via Smart Paste (${leadType})`
+        notes: `Logged via Smart Extractor (${leadType})`
       };
 
       leads.unshift(newLead);
       saveState();
 
-      // Reset smart box
+      // Clear input box
       document.getElementById("smartPasteText").value = "";
       document.getElementById("smartFormName").value = "";
       document.getElementById("smartFormPhone").value = "";
@@ -1036,8 +1081,8 @@
 
       renderEmployeeDashboard();
 
-      // Ask if employee wants to send WhatsApp right now
-      if (confirm(`✅ Lead Save Ho Gayi!\n\nKya aap ${company} (${phone}) ko abhi WhatsApp message bhejna chahte hain?`)) {
+      // Instant WhatsApp prompt
+      if (confirm(`✅ Clean Lead Save Ho Gayi!\n\nName: ${company}\nMobile: ${phone}\nBrand: ${brand}\nRequirement: ${req}\n\nKya aap abhi WhatsApp message bhejna chahte hain?`)) {
         sendCustomerWhatsApp(newLead.id);
       }
     }
@@ -1049,7 +1094,6 @@
 
       const template = templates[lead.brand] || "Namaste {name} ji, hum {brand} se baat kar rahe hain. Aapki {source} par inquiry aayi thi. Best wholesale catalog ke liye connect karein.";
 
-      // Replace placeholders
       let message = template
         .replace(/{name}/g, lead.company)
         .replace(/{brand}/g, lead.brand)
@@ -1104,7 +1148,75 @@
       }
     }
 
-    // ADMIN DASHBOARD LOGIC
+    // EMPLOYEE DASHBOARD
+    function renderEmployeeDashboard() {
+      document.getElementById("empGreeting").innerText = `Welcome, ${currentUser.name}`;
+      
+      const brandContainer = document.getElementById("empBrandBadges");
+      brandContainer.innerHTML = currentUser.brands.map(b => 
+        `<span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700 border border-slate-200 font-medium">${b}</span>`
+      ).join("");
+
+      const selectEl = document.getElementById("smartFormBrand");
+      selectEl.innerHTML = currentUser.brands.map(b => `<option value="${b}">${b}</option>`).join("");
+
+      const myLeads = leads.filter(l => l.callerId === currentUser.id || currentUser.brands.includes(l.brand));
+
+      const totalCalls = myLeads.length;
+      const buyLeadsCount = myLeads.filter(l => l.leadType === "BuyLead").length;
+      const wonCalls = myLeads.filter(l => l.converted === "Yes").length;
+      const wonRevenue = myLeads.filter(l => l.converted === "Yes").reduce((sum, l) => sum + Number(l.est || 0), 0);
+
+      document.getElementById("empKpiTotal").innerText = totalCalls;
+      document.getElementById("empKpiBuyLeads").innerText = `${buyLeadsCount} BuyLeads`;
+      document.getElementById("empKpiWon").innerText = wonCalls;
+      document.getElementById("empKpiRevenue").innerText = `₹${wonRevenue.toLocaleString('en-IN')}`;
+      document.getElementById("empLeadCount").innerText = `${myLeads.length} Leads`;
+
+      const tbody = document.getElementById("empLeadsTableBody");
+      tbody.innerHTML = "";
+
+      if (myLeads.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400">No leads available for your brands.</td></tr>`;
+        return;
+      }
+
+      myLeads.forEach(l => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-50/70 transition";
+        
+        let typeBadge = l.leadType === "BuyLead" 
+          ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">BuyLead</span>`
+          : `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Enquiry</span>`;
+
+        let convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span>`;
+        if (l.converted === "Yes") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Won</span>`;
+        if (l.converted === "No") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Lost</span>`;
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">${l.brand}</td>
+          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.source} ${typeBadge}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-900">${l.company}</td>
+          <td class="py-2.5 px-3 font-mono font-medium text-slate-800">${l.phone}</td>
+          <td class="py-2.5 px-3 text-slate-500">${l.city}</td>
+          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">${l.req}</td>
+          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${Number(l.est).toLocaleString('en-IN')}</td>
+          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">${l.status}</span></td>
+          <td class="py-2.5 px-3">${convBadge}</td>
+          <td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1.5">
+            <button onclick="sendCustomerWhatsApp('${l.id}')" class="text-xs px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium shadow-2xs inline-flex items-center gap-1 cursor-pointer">
+              <span>💬</span> Send WA
+            </button>
+            <a href="tel:${l.phone}" class="text-xs px-2 py-1 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-medium inline-block">Call</a>
+            <button onclick="toggleWonLead('${l.id}')" class="text-[11px] px-1.5 py-1 rounded border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium cursor-pointer">${l.converted === 'Yes' ? 'Undo' : 'Won'}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ADMIN DASHBOARD
     function switchAdminTab(tab) {
       document.getElementById("adminTabOverview").classList.add("hidden");
       document.getElementById("adminTabUpload").classList.add("hidden");
