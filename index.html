@@ -677,6 +677,13 @@
               </div>
             </div>
 
+                        <!-- Employee-wise Google Sheets -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
+              <h4 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">👤 Employee-wise Google Sheet</h4>
+              <p class="text-[11px] text-slate-500 leading-relaxed">Har employee ki alag Google Sheet banao, use apne <strong>boss Google account</strong> ko <strong>Editor</strong> access se share karo, aur uska link yahan paste karo. Employee ki lead sirf uski sheet me (aur master sheet me) jayegi.</p>
+              <div id="empSheetsList"></div>
+            </div>
+
             <!-- Bulk Sync -->
             <div class="space-y-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
               <h4 class="font-semibold text-xs text-amber-900 uppercase tracking-wider">⬆️ Purane Leads Bhi Sync Karo</h4>
@@ -757,6 +764,23 @@
           <select id="templateBrandSelect" onchange="loadBrandTemplate()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
             <!-- Populated dynamically -->
           </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Inquiry Source (har source ka alag message):</label>
+          <select id="templateSourceSelect" onchange="loadBrandTemplate()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
+            <option value="">Sab sources (default)</option>
+            <option value="Indiamart">Indiamart</option>
+            <option value="TradeIndia">TradeIndia</option>
+            <option value="Website">Website</option>
+            <option value="Meta Ads">Meta Ads</option>
+            <option value="Direct Call">Direct Call</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Is source ka WhatsApp sender number (reminder ke liye):</label>
+          <input type="text" id="templateSenderInput" placeholder="e.g. 9876543210" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
         </div>
 
         <div>
@@ -1257,6 +1281,11 @@
       if (fullLower.includes("indiamart")) document.getElementById("smartFormSource").value = "Indiamart";
       else if (fullLower.includes("tradeindia")) document.getElementById("smartFormSource").value = "TradeIndia";
 
+      // Auto detect lead type (BuyLead / Direct Enquiry)
+      const ltRadio = (v) => document.querySelector(`input[name="empLeadType"][value="${v}"]`);
+      if (/buy\s*-?\s*lead|\brfq\b/i.test(fullLower)) ltRadio("BuyLead").checked = true;
+      else if (/direct\s*enq/i.test(fullLower)) ltRadio("Direct Enquiry").checked = true;
+
       document.getElementById("quickStatusTag").classList.remove("hidden");
     }
 
@@ -1326,33 +1355,91 @@
     // GOOGLE SHEETS INTEGRATION FUNCTIONS
     // ================================================
 
-    // Push ONE lead to Google Sheets via Apps Script Web App
-    function pushLeadToSheets(lead) {
-      const url = localStorage.getItem("crm_sheets_url") || "";
-      const autoSync = localStorage.getItem("crm_sheets_autosync") === "true";
-      if (!url || !autoSync) return; // Only push if enabled and URL set
+    // ---- Per-employee sheet helpers ----
+    // Optional: yahan hardcode bhi kar sakte ho taaki har device par chale
+    const SHEETS_WEBAPP_URL = "";          // e.g. "https://script.google.com/macros/s/XXXX/exec"
+    const EMPLOYEE_SHEETS = {};            // e.g. { rahul: "1AbC...sheetId", priya: "1XyZ..." }
 
+    function getSheetsUrl() { return SHEETS_WEBAPP_URL || localStorage.getItem("crm_sheets_url") || ""; }
+    function isAutoSync() { return SHEETS_WEBAPP_URL ? true : localStorage.getItem("crm_sheets_autosync") === "true"; }
+    function getEmpSheets() {
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem("crm_emp_sheets")) || {}; } catch(e) {}
+      return Object.assign({}, saved, EMPLOYEE_SHEETS);
+    }
+    function buildSheetPayload(lead) {
       const callerObj = users.find(u => u.id === lead.callerId);
-      const payload = Object.assign({}, lead, { callerName: callerObj ? callerObj.name : lead.callerId });
+      return Object.assign({}, lead, {
+        callerName: callerObj ? callerObj.name : lead.callerId,
+        sheetId: getEmpSheets()[lead.callerId] || ""
+      });
+    }
 
-      fetch(url, {
+    // Push ONE lead: master sheet + us employee ki apni sheet
+    function pushLeadToSheets(lead) {
+      const url = getSheetsUrl();
+      if (!url || !isAutoSync()) return Promise.resolve();
+      return fetch(url, {
         method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "text/plain" } // Apps Script needs text/plain to avoid CORS preflight
+        body: JSON.stringify(buildSheetPayload(lead)),
+        headers: { "Content-Type": "text/plain" } // Apps Script: CORS preflight avoid
       })
       .then(r => r.json())
       .then(data => {
-        if (data.success) {
-          console.log("✅ Lead pushed to Google Sheets:", lead.id);
-        } else {
-          console.warn("⚠️ Sheets push failed:", data.error);
-        }
+        if (data.success) console.log("Lead pushed to Sheets:", lead.id);
+        else console.warn("Sheets push failed:", data.error);
       })
-      .catch(err => console.warn("⚠️ Sheets connection error:", err));
+      .catch(err => console.warn("Sheets connection error:", err));
+    }
+
+    function renderEmpSheetsList() {
+      const box = document.getElementById("empSheetsList");
+      if (!box) return;
+      const map = getEmpSheets();
+      const emps = users.filter(u => u.role !== "admin");
+      box.innerHTML = emps.length ? emps.map(u => `
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 py-2 border-b border-slate-100">
+          <div class="sm:w-40 text-xs font-semibold text-slate-800">${u.name}</div>
+          <input type="text" id="empSheet_${u.id}" value="${map[u.id] || ''}" placeholder="Is employee ki Google Sheet ka link ya ID paste karo"
+            class="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-xs outline-none focus:border-slate-900">
+          <button onclick="saveEmpSheet('${u.id}')" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium cursor-pointer">Save</button>
+          <button onclick="testEmpSheet('${u.id}')" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium cursor-pointer">Test</button>
+        </div>`).join("") : '<p class="text-xs text-slate-400">Abhi koi employee nahi hai.</p>';
+    }
+
+    function saveEmpSheet(userId) {
+      const raw = document.getElementById("empSheet_" + userId).value.trim();
+      const m = raw.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      const id = m ? m[1] : raw;
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem("crm_emp_sheets")) || {}; } catch(e) {}
+      if (id) saved[userId] = id; else delete saved[userId];
+      localStorage.setItem("crm_emp_sheets", JSON.stringify(saved));
+      document.getElementById("empSheet_" + userId).value = id;
+      showSheetsBanner(id ? "✅ Sheet save ho gayi. Ab 'Test' dabake check karo." : "Sheet hata di gayi.", id ? "green" : "amber");
+    }
+
+    function testEmpSheet(userId) {
+      const url = getSheetsUrl();
+      if (!url) { showSheetsBanner("❌ Pehle upar Web App URL save karo!", "red"); return; }
+      const u = users.find(x => x.id === userId);
+      const sheetId = getEmpSheets()[userId];
+      if (!sheetId) { showSheetsBanner("❌ Pehle is employee ki Sheet save karo!", "red"); return; }
+      showSheetsBanner("⏳ Testing " + u.name + " ki sheet...", "amber");
+      const t = { id: "TEST_" + Date.now(), date: new Date().toISOString().slice(0,10), brand: "Test Brand", source: "Test", leadType: "Test",
+        clientName: "Test Client", companyName: "Test Company", phone: "9999999999", email: "test@test.com", city: "Delhi", state: "Delhi",
+        country: "India", req: "Connection Test - delete kar sakte ho", est: 0, status: "New (Not Called)", converted: "Pending",
+        callerId: userId, callerName: u.name, sheetId: sheetId };
+      fetch(url, { method: "POST", body: JSON.stringify(t), headers: { "Content-Type": "text/plain" } })
+        .then(r => r.json())
+        .then(d => showSheetsBanner(d.success ? "🎉 " + u.name + " ki sheet me test row add ho gayi!" : "❌ Error: " + d.error +
+          " (Check: Sheet ID sahi hai? Sheet boss ke Google account ke saath Editor access se share hai?)", d.success ? "green" : "red"))
+        .catch(() => showSheetsBanner("❌ Connection fail. Apps Script URL / 'Anyone' access check karo.", "red"));
     }
 
     // Init Google Sheets Tab — load saved URL and toggle state
     function initSheetsTab() {
+      renderEmpSheetsList();
       const savedUrl = localStorage.getItem("crm_sheets_url") || "";
       const autoSync = localStorage.getItem("crm_sheets_autosync") === "true";
       const urlInput = document.getElementById("sheetsWebAppUrl");
@@ -1410,14 +1497,13 @@
 
     // Bulk push all existing leads
     async function bulkSyncAllLeads() {
-      const url = localStorage.getItem("crm_sheets_url") || "";
+      const url = getSheetsUrl();
       if (!url) { showSheetsBanner("❌ Pehle URL save karo!", "red"); return; }
       const statusEl = document.getElementById("bulkSyncStatus");
       statusEl.textContent = "⏳ Pushing leads...";
       let pushed = 0;
       for (const lead of leads) {
-        const callerObj = users.find(u => u.id === lead.callerId);
-        const payload = Object.assign({}, lead, { callerName: callerObj ? callerObj.name : lead.callerId });
+        const payload = buildSheetPayload(lead);
         try {
           await fetch(url, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain" } });
           pushed++;
@@ -1444,32 +1530,33 @@
 
     // Copy Apps Script code to clipboard
     function copyAppsScriptCode() {
-      const code = `const SHEET_NAME = "CRM Leads";
+      const code = `const MASTER_SHEET = "CRM Leads";
+const HEADERS = ["Date","Brand","Source","Lead Type","Client Name","Company/Firm","Mobile","Email","City","State","Country","Requirement","Est. Value (Rs)","Call Disposition","Order Converted","Caller Name","Caller ID","Lead ID","Saved At"];
+
+function addRow_(ss, tabName, d, color) {
+  var sh = ss.getSheetByName(tabName);
+  if (!sh) {
+    sh = ss.insertSheet(tabName);
+    sh.getRange(1,1,1,HEADERS.length).setValues([HEADERS]).setBackground(color).setFontColor("#ffffff").setFontWeight("bold");
+    sh.setFrozenRows(1);
+  }
+  var now = new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});
+  var row = [d.date||"",d.brand||"",d.source||"",d.leadType||"",d.clientName||"",d.companyName||"",d.phone||"",d.email||"",d.city||"",d.state||"",d.country||"",d.req||"",d.est||0,d.status||"",d.converted||"",d.callerName||"",d.callerId||"",d.id||"",now];
+  var found = null;
+  if (sh.getLastRow() > 1 && d.id) {
+    found = sh.getRange(2,18,sh.getLastRow()-1,1).createTextFinder(String(d.id)).matchEntireCell(true).findNext();
+  }
+  if (found) sh.getRange(found.getRow(),1,1,row.length).setValues([row]);
+  else sh.appendRow(row);
+  sh.autoResizeColumns(1, HEADERS.length);
+}
 
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet) {
-      sheet = ss.insertSheet(SHEET_NAME);
-      const headers = ["Date","Brand","Source","Lead Type","Client Name","Company/Firm","Mobile","Email","City","State","Country","Requirement","Est. Value (Rs)","Call Disposition","Order Converted","Caller Name","Caller ID","Lead ID","Saved At"];
-      sheet.getRange(1,1,1,headers.length).setValues([headers]);
-      sheet.getRange(1,1,1,headers.length).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
-      sheet.setFrozenRows(1);
-    }
-    const callerSheet = data.callerName ? data.callerName.split(" ")[0] + "'s Leads" : "Caller";
-    let cs = ss.getSheetByName(callerSheet);
-    if (!cs) {
-      cs = ss.insertSheet(callerSheet);
-      const h2 = ["Date","Brand","Source","Lead Type","Client Name","Company/Firm","Mobile","Email","City","State","Country","Requirement","Est. Value (Rs)","Call Disposition","Order Converted","Lead ID","Saved At"];
-      cs.getRange(1,1,1,h2.length).setValues([h2]);
-      cs.getRange(1,1,1,h2.length).setBackground("#0f4c81").setFontColor("#ffffff").setFontWeight("bold");
-      cs.setFrozenRows(1);
-    }
-    const now = new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});
-    sheet.appendRow([data.date||"",data.brand||"",data.source||"",data.leadType||"",data.clientName||"",data.companyName||"",data.phone||"",data.email||"",data.city||"",data.state||"",data.country||"",data.req||"",data.est||0,data.status||"",data.converted||"",data.callerName||"",data.callerId||"",data.id||"",now]);
-    cs.appendRow([data.date||"",data.brand||"",data.source||"",data.leadType||"",data.clientName||"",data.companyName||"",data.phone||"",data.email||"",data.city||"",data.state||"",data.country||"",data.req||"",data.est||0,data.status||"",data.converted||"",data.id||"",now]);
+    var d = JSON.parse(e.postData.contents);
+    var master = SpreadsheetApp.getActiveSpreadsheet();
+    if (master) addRow_(master, MASTER_SHEET, d, "#1e293b");
+    if (d.sheetId) addRow_(SpreadsheetApp.openById(d.sheetId), "Leads", d, "#0f4c81");
     return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
     return ContentService.createTextOutput(JSON.stringify({success:false,error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
@@ -1487,7 +1574,11 @@ function doPost(e) {
       const lead = leads.find(l => l.id === leadId);
       if (!lead) return;
 
-      const template = templates[lead.brand] || "Namaste {name} ji, hum {brand} se baat kar rahe hain. Aapki {source} par inquiry aayi thi. Best wholesale catalog ke liye connect karein.";
+      const template = getTemplate(lead.brand, lead.source) || "Namaste {name} ji, hum {brand} se baat kar rahe hain. Aapki {source} par inquiry aayi thi. Best wholesale catalog ke liye connect karein.";
+
+      // Sender guard: is source ke liye jo WhatsApp number set hai wahi account khula ho
+      const sender = getWaSenders()[lead.source];
+      if (sender && !confirm(`📲 Ye ${lead.source} ki lead hai.\n\nMessage sirf ${lead.source} wale WhatsApp number (${sender}) se bhejna hai.\nKya aapke WhatsApp me wahi number khula hai?`)) return;
 
       let message = template
         .replace(/{name}/g, lead.clientName || lead.company)
@@ -1536,6 +1627,7 @@ function doPost(e) {
       }
 
       saveState();
+      pushLeadToSheets(lead); // sheet me update
       if (currentUser.role === "admin") renderAdminDashboard();
       else renderEmployeeDashboard();
     }
@@ -1548,6 +1640,7 @@ function doPost(e) {
       if (val !== null) {
         lead.est = Number(val.replace(/[^0-9]/g, '')) || 0;
         saveState();
+        pushLeadToSheets(lead); // sheet me update
         if (currentUser.role === "admin") renderAdminDashboard();
         else renderEmployeeDashboard();
       }
@@ -1575,21 +1668,35 @@ function doPost(e) {
       document.getElementById("templateModal").classList.add("hidden");
     }
 
+    function tplKey(brand, source) { return source ? brand + "||" + source : brand; }
+    function getTemplate(brand, source) { return templates[tplKey(brand, source)] || templates[brand] || ""; }
+    function getWaSenders() { try { return JSON.parse(localStorage.getItem("crm_wa_senders")) || {}; } catch(e) { return {}; } }
+
     function loadBrandTemplate() {
       const brand = document.getElementById("templateBrandSelect").value;
-      document.getElementById("templateTextarea").value = templates[brand] || "";
+      const src = document.getElementById("templateSourceSelect").value;
+      document.getElementById("templateTextarea").value = getTemplate(brand, src);
+      document.getElementById("templateSenderInput").value = src ? (getWaSenders()[src] || "") : "";
+      document.getElementById("templateSenderInput").disabled = !src;
     }
 
     function saveBrandTemplate() {
       const brand = document.getElementById("templateBrandSelect").value;
+      const src = document.getElementById("templateSourceSelect").value;
       const text = document.getElementById("templateTextarea").value.trim();
       if (!text) {
         alert("Template text empty nahi ho sakta!");
         return;
       }
-      templates[brand] = text;
+      templates[tplKey(brand, src)] = text;
+      if (src) {
+        const senders = getWaSenders();
+        const num = document.getElementById("templateSenderInput").value.replace(/[^0-9]/g, "");
+        if (num) senders[src] = num; else delete senders[src];
+        localStorage.setItem("crm_wa_senders", JSON.stringify(senders));
+      }
       saveState();
-      alert(`✅ ${brand} ke liye WhatsApp intro message template update ho gaya!`);
+      alert(`✅ ${brand} (${src || "sab sources"}) ka WhatsApp message template save ho gaya!`);
       closeTemplateEditor();
     }
 
@@ -1608,6 +1715,7 @@ function doPost(e) {
           lead.status = "Interested / Quote Sent";
         }
         saveState();
+        pushLeadToSheets(lead); // sheet me update
         if (currentUser.role === "admin") renderAdminDashboard();
         else renderEmployeeDashboard();
       }
@@ -1947,8 +2055,10 @@ function doPost(e) {
 
     function commitBulkImport() {
       if (stagedUploadLeads.length === 0) return;
+      const toPush = stagedUploadLeads.slice();
       leads.unshift(...stagedUploadLeads);
       saveState();
+      (async () => { for (const l of toPush) { await pushLeadToSheets(l); } })();
       alert(`✅ ${stagedUploadLeads.length} Leads successfully import ho gayi hain!`);
       cancelUploadPreview();
       switchAdminTab("allLeads");
