@@ -117,7 +117,9 @@
           </button>
           <button onclick="switchAdminTab('team')" id="tabBtnTeam" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">Team & Access</button>
           <button onclick="switchAdminTab('allLeads')" id="tabBtnAllLeads" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">All Leads Pool</button>
+          <button onclick="switchAdminTab('sheets')" id="tabBtnSheets" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1">📊 Sheets Sync</button>
         </div>
+
 
         <!-- Right Side: Clock, Template Editor & Logout -->
         <div class="flex items-center gap-2">
@@ -613,6 +615,87 @@
                 <span class="text-xs text-slate-500">Edit access permissions</span>
               </div>
               <div id="usersListContainer" class="space-y-2.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: GOOGLE SHEETS INTEGRATION -->
+        <div id="adminTabSheets" class="space-y-6 hidden">
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs space-y-5">
+            <div class="border-b border-slate-100 pb-3">
+              <h3 class="font-semibold text-sm text-slate-900">📊 Google Sheets Auto-Sync</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Jab bhi koi lead save ho — automatically Google Sheets me row add ho jayegi</p>
+            </div>
+
+            <!-- Status Banner -->
+            <div id="sheetsStatusBanner" class="hidden rounded-xl px-4 py-3 text-xs font-medium border"></div>
+
+            <!-- Step 1 -->
+            <div class="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">1</span>
+                <h4 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Apps Script Deploy URL Paste Karo</h4>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">Pehle Google Sheet me <strong>Extensions → Apps Script</strong> code paste karo, Deploy karo, aur wahan se mila URL yahan paste karo.</p>
+              <div class="flex gap-2">
+                <input type="url" id="sheetsWebAppUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec" 
+                  class="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono outline-none focus:border-slate-900" />
+                <button onclick="saveSheetsUrl()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition cursor-pointer whitespace-nowrap">
+                  Save URL
+                </button>
+              </div>
+              <div id="savedSheetsUrl" class="text-[11px] text-slate-500"></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">2</span>
+                <h4 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Connection Test Karo</h4>
+              </div>
+              <p class="text-[11px] text-slate-500">URL save karne ke baad yahan test karo ki Google Sheets se connection sahi hai ya nahi.</p>
+              <button onclick="testSheetsConnection()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition cursor-pointer">
+                🔗 Test Connection
+              </button>
+            </div>
+
+            <!-- Step 3 - Auto Sync Toggle -->
+            <div class="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">3</span>
+                <h4 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Auto-Sync Enable / Disable</h4>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium text-slate-700">Automatic Google Sheets Sync</p>
+                  <p class="text-[11px] text-slate-500">On karne se har nayi lead automatically Sheet me jayegi</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="sheetsAutoSyncToggle" onchange="toggleAutoSync()" class="sr-only peer">
+                  <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Bulk Sync -->
+            <div class="space-y-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+              <h4 class="font-semibold text-xs text-amber-900 uppercase tracking-wider">⬆️ Purane Leads Bhi Sync Karo</h4>
+              <p class="text-[11px] text-amber-700">Agar pehle se kuch leads portal me hain aur unhe bhi Google Sheet me chahiye, toh yeh button use karo.</p>
+              <div class="flex items-center gap-3">
+                <button onclick="bulkSyncAllLeads()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium transition cursor-pointer">
+                  📤 Push All Existing Leads to Sheets
+                </button>
+                <span id="bulkSyncStatus" class="text-[11px] text-amber-700"></span>
+              </div>
+            </div>
+
+            <!-- Apps Script Code Download -->
+            <div class="space-y-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <h4 class="font-semibold text-xs text-blue-900 uppercase tracking-wider">📋 Apps Script Code</h4>
+              <p class="text-[11px] text-blue-700">Yeh code Google Apps Script me paste karna hoga. Copy karo aur <strong>Extensions → Apps Script</strong> me paste karo.</p>
+              <button onclick="copyAppsScriptCode()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition cursor-pointer">
+                📋 Copy Apps Script Code
+              </button>
             </div>
           </div>
         </div>
@@ -1227,6 +1310,9 @@
       leads.unshift(newLead);
       saveState();
 
+      // AUTO PUSH TO GOOGLE SHEETS (if enabled)
+      pushLeadToSheets(newLead);
+
       clearSmartPaste();
       renderEmployeeDashboard();
 
@@ -1234,6 +1320,166 @@
       if (confirm(`✅ Clean Lead Save Ho Gayi!\n\nClient: ${clientName}\nCompany: ${companyName}\nMobile: ${phone}\nBrand: ${brand}\nRequirement: ${req}\nStatus: ${status}\n\nKya aap abhi WhatsApp message bhejna chahte hain?`)) {
         sendCustomerWhatsApp(newLead.id);
       }
+    }
+
+    // ================================================
+    // GOOGLE SHEETS INTEGRATION FUNCTIONS
+    // ================================================
+
+    // Push ONE lead to Google Sheets via Apps Script Web App
+    function pushLeadToSheets(lead) {
+      const url = localStorage.getItem("crm_sheets_url") || "";
+      const autoSync = localStorage.getItem("crm_sheets_autosync") === "true";
+      if (!url || !autoSync) return; // Only push if enabled and URL set
+
+      const callerObj = users.find(u => u.id === lead.callerId);
+      const payload = Object.assign({}, lead, { callerName: callerObj ? callerObj.name : lead.callerId });
+
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain" } // Apps Script needs text/plain to avoid CORS preflight
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          console.log("✅ Lead pushed to Google Sheets:", lead.id);
+        } else {
+          console.warn("⚠️ Sheets push failed:", data.error);
+        }
+      })
+      .catch(err => console.warn("⚠️ Sheets connection error:", err));
+    }
+
+    // Init Google Sheets Tab — load saved URL and toggle state
+    function initSheetsTab() {
+      const savedUrl = localStorage.getItem("crm_sheets_url") || "";
+      const autoSync = localStorage.getItem("crm_sheets_autosync") === "true";
+      const urlInput = document.getElementById("sheetsWebAppUrl");
+      const toggle = document.getElementById("sheetsAutoSyncToggle");
+      const savedDisplay = document.getElementById("savedSheetsUrl");
+      if (urlInput) urlInput.value = savedUrl;
+      if (toggle) toggle.checked = autoSync;
+      if (savedDisplay) {
+        savedDisplay.textContent = savedUrl ? "✅ Saved URL: " + savedUrl.substring(0, 60) + "..." : "⚠️ Koi URL save nahi hai abhi";
+      }
+    }
+
+    // Save Google Sheets URL to localStorage
+    function saveSheetsUrl() {
+      const url = document.getElementById("sheetsWebAppUrl").value.trim();
+      if (!url || !url.startsWith("https://script.google.com")) {
+        showSheetsBanner("❌ Sahi Apps Script URL paste karo (https://script.google.com/macros/s/.../exec)", "red");
+        return;
+      }
+      localStorage.setItem("crm_sheets_url", url);
+      document.getElementById("savedSheetsUrl").textContent = "✅ URL save ho gayi: " + url.substring(0, 60) + "...";
+      showSheetsBanner("✅ Google Sheets URL save ho gayi! Ab 'Test Connection' karo.", "green");
+    }
+
+    // Toggle auto sync
+    function toggleAutoSync() {
+      const checked = document.getElementById("sheetsAutoSyncToggle").checked;
+      localStorage.setItem("crm_sheets_autosync", checked ? "true" : "false");
+      showSheetsBanner(checked ? "✅ Auto-Sync ON! Ab har nayi lead Google Sheets me jayegi." : "⏸️ Auto-Sync OFF kar diya.", checked ? "green" : "amber");
+    }
+
+    // Test connection to Apps Script
+    function testSheetsConnection() {
+      const url = localStorage.getItem("crm_sheets_url") || "";
+      if (!url) { showSheetsBanner("❌ Pehle URL save karo!", "red"); return; }
+      showSheetsBanner("⏳ Testing connection...", "amber");
+      const testLead = {
+        id: "TEST_" + Date.now(), date: new Date().toISOString().slice(0,10),
+        brand: "Test Brand", source: "Test", leadType: "Test",
+        clientName: "Test Client", companyName: "Test Company",
+        phone: "9999999999", email: "test@test.com",
+        city: "Delhi", state: "Delhi", country: "India",
+        req: "CRM Connection Test — Isko delete kar sakte ho", qty: 1, est: 0,
+        status: "New (Not Called)", converted: "Pending",
+        callerId: currentUser.id, callerName: currentUser.name, notes: "Auto-test"
+      };
+      fetch(url, { method: "POST", body: JSON.stringify(testLead), headers: { "Content-Type": "text/plain" } })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) showSheetsBanner("🎉 Connection Successful! Google Sheets me test row add ho gayi. Wahan jaake check karo.", "green");
+          else showSheetsBanner("❌ Error: " + data.error, "red");
+        })
+        .catch(() => showSheetsBanner("❌ Connection fail hua. Apps Script URL check karo aur 'Anyone' access diya hai ya nahi dekho.", "red"));
+    }
+
+    // Bulk push all existing leads
+    async function bulkSyncAllLeads() {
+      const url = localStorage.getItem("crm_sheets_url") || "";
+      if (!url) { showSheetsBanner("❌ Pehle URL save karo!", "red"); return; }
+      const statusEl = document.getElementById("bulkSyncStatus");
+      statusEl.textContent = "⏳ Pushing leads...";
+      let pushed = 0;
+      for (const lead of leads) {
+        const callerObj = users.find(u => u.id === lead.callerId);
+        const payload = Object.assign({}, lead, { callerName: callerObj ? callerObj.name : lead.callerId });
+        try {
+          await fetch(url, { method: "POST", body: JSON.stringify(payload), headers: { "Content-Type": "text/plain" } });
+          pushed++;
+          statusEl.textContent = `⏳ ${pushed}/${leads.length} pushed...`;
+        } catch(e) { /* skip failed */ }
+      }
+      statusEl.textContent = `✅ ${pushed} leads pushed to Google Sheets!`;
+      showSheetsBanner(`✅ ${pushed} leads successfully Google Sheets me push ho gaye!`, "green");
+    }
+
+    // Show status banner in Sheets tab
+    function showSheetsBanner(msg, color) {
+      const el = document.getElementById("sheetsStatusBanner");
+      if (!el) return;
+      el.classList.remove("hidden");
+      const colorMap = {
+        green: "bg-emerald-50 border-emerald-200 text-emerald-800",
+        red: "bg-red-50 border-red-200 text-red-800",
+        amber: "bg-amber-50 border-amber-200 text-amber-800"
+      };
+      el.className = "rounded-xl px-4 py-3 text-xs font-medium border " + (colorMap[color] || colorMap.amber);
+      el.textContent = msg;
+    }
+
+    // Copy Apps Script code to clipboard
+    function copyAppsScriptCode() {
+      const code = `const SHEET_NAME = "CRM Leads";
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      const headers = ["Date","Brand","Source","Lead Type","Client Name","Company/Firm","Mobile","Email","City","State","Country","Requirement","Est. Value (Rs)","Call Disposition","Order Converted","Caller Name","Caller ID","Lead ID","Saved At"];
+      sheet.getRange(1,1,1,headers.length).setValues([headers]);
+      sheet.getRange(1,1,1,headers.length).setBackground("#1e293b").setFontColor("#ffffff").setFontWeight("bold");
+      sheet.setFrozenRows(1);
+    }
+    const callerSheet = data.callerName ? data.callerName.split(" ")[0] + "'s Leads" : "Caller";
+    let cs = ss.getSheetByName(callerSheet);
+    if (!cs) {
+      cs = ss.insertSheet(callerSheet);
+      const h2 = ["Date","Brand","Source","Lead Type","Client Name","Company/Firm","Mobile","Email","City","State","Country","Requirement","Est. Value (Rs)","Call Disposition","Order Converted","Lead ID","Saved At"];
+      cs.getRange(1,1,1,h2.length).setValues([h2]);
+      cs.getRange(1,1,1,h2.length).setBackground("#0f4c81").setFontColor("#ffffff").setFontWeight("bold");
+      cs.setFrozenRows(1);
+    }
+    const now = new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});
+    sheet.appendRow([data.date||"",data.brand||"",data.source||"",data.leadType||"",data.clientName||"",data.companyName||"",data.phone||"",data.email||"",data.city||"",data.state||"",data.country||"",data.req||"",data.est||0,data.status||"",data.converted||"",data.callerName||"",data.callerId||"",data.id||"",now]);
+    cs.appendRow([data.date||"",data.brand||"",data.source||"",data.leadType||"",data.clientName||"",data.companyName||"",data.phone||"",data.email||"",data.city||"",data.state||"",data.country||"",data.req||"",data.est||0,data.status||"",data.converted||"",data.id||"",now]);
+    return ContentService.createTextOutput(JSON.stringify({success:true})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({success:false,error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+      navigator.clipboard.writeText(code).then(() => {
+        showSheetsBanner("✅ Apps Script code clipboard me copy ho gaya! Ab Google Sheets me Extensions → Apps Script me paste karo.", "green");
+      }).catch(() => {
+        alert("Copy karne me error aaya. File me se manually copy karo:\nC:\\Users\\USER\\.gemini\\antigravity\\scratch\\telecaller_crm\\google_apps_script.js");
+      });
     }
 
     // 1-CLICK SEND WHATSAPP TO CUSTOMER WITH TEMPLATE
@@ -1472,31 +1718,37 @@
 
     // ADMIN DASHBOARD
     function switchAdminTab(tab) {
-      document.getElementById("adminTabOverview").classList.add("hidden");
-      document.getElementById("adminTabUpload").classList.add("hidden");
-      document.getElementById("adminTabTeam").classList.add("hidden");
-      document.getElementById("adminTabAllLeads").classList.add("hidden");
+      const allTabs = ["adminTabOverview","adminTabUpload","adminTabTeam","adminTabAllLeads","adminTabSheets"];
+      const allBtns = ["tabBtnOverview","tabBtnUpload","tabBtnTeam","tabBtnAllLeads","tabBtnSheets"];
+      allTabs.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add("hidden"); });
+      allBtns.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (id === "tabBtnUpload") el.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer font-semibold flex items-center gap-1.5";
+        else if (id === "tabBtnSheets") el.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1";
+        else el.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
+      });
 
-      document.getElementById("tabBtnOverview").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
-      document.getElementById("tabBtnUpload").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer font-semibold flex items-center gap-1.5";
-      document.getElementById("tabBtnTeam").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
-      document.getElementById("tabBtnAllLeads").className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer";
-
+      const activeClass = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
       if (tab === "overview") {
         document.getElementById("adminTabOverview").classList.remove("hidden");
-        document.getElementById("tabBtnOverview").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
+        document.getElementById("tabBtnOverview").className = activeClass;
       } else if (tab === "upload") {
         document.getElementById("adminTabUpload").classList.remove("hidden");
-        document.getElementById("tabBtnUpload").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer flex items-center gap-1.5";
+        document.getElementById("tabBtnUpload").className = activeClass + " flex items-center gap-1.5";
         initUploadTab();
       } else if (tab === "team") {
         document.getElementById("adminTabTeam").classList.remove("hidden");
-        document.getElementById("tabBtnTeam").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
+        document.getElementById("tabBtnTeam").className = activeClass;
         renderUsersList();
       } else if (tab === "allLeads") {
         document.getElementById("adminTabAllLeads").classList.remove("hidden");
-        document.getElementById("tabBtnAllLeads").className = "px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-2xs font-semibold cursor-pointer";
+        document.getElementById("tabBtnAllLeads").className = activeClass;
         renderBossAllLeads();
+      } else if (tab === "sheets") {
+        document.getElementById("adminTabSheets").classList.remove("hidden");
+        document.getElementById("tabBtnSheets").className = activeClass + " flex items-center gap-1";
+        initSheetsTab();
       }
     }
 
