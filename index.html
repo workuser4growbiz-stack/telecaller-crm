@@ -7,9 +7,12 @@
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { 
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      letter-spacing: -0.012em;
+    }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #f8fafc; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -165,99 +168,159 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- 🌟 SMART LEAD EXTRACTOR (CLEAN AUTO-PARSING ENGINE)       -->
+        <!-- 🌟 SMART LEAD EXTRACTOR (ENTERPRISE PARSING ENGINE)         -->
         <!-- ========================================================= -->
-        <div class="bg-white border-2 border-indigo-100 rounded-xl p-5 shadow-xs space-y-4">
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
             <div>
               <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <span class="p-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold">⚡ Smart Paste</span>
-                <span>IndiaMART / TradeIndia Lead Extractor</span>
+                <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">⚡ Smart Lead Extractor</span>
+                <span>IndiaMART / TradeIndia B2B Parser</span>
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">Yahan raw text paste karein — System Date, Mobile Number, Client Name aur Requirement ko alag-alag clean karega!</p>
+              <p class="text-xs text-slate-500 mt-0.5">Raw lead text paste karein — Client Name, Company, Email, Phone, State, City aur Product auto-separate ho jayenge!</p>
             </div>
-            <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-200">
-              <span class="text-[11px] font-medium text-slate-500 px-1">Type:</span>
-              <label class="flex items-center gap-1 text-xs cursor-pointer px-2 py-0.5 rounded bg-white font-medium border border-slate-200 text-slate-800">
+            <div class="flex items-center gap-2 bg-slate-100/70 p-1 rounded-xl border border-slate-200/80">
+              <span class="text-[11px] font-semibold text-slate-500 px-1.5">Inquiry Type:</span>
+              <label class="flex items-center gap-1.5 text-xs cursor-pointer px-2.5 py-1 rounded-lg bg-white font-medium border border-slate-200 text-slate-800 shadow-2xs">
                 <input type="radio" name="empLeadType" value="Direct Enquiry" checked> Direct Enquiry
               </label>
-              <label class="flex items-center gap-1 text-xs cursor-pointer px-2 py-0.5 rounded font-medium text-indigo-700">
+              <label class="flex items-center gap-1.5 text-xs cursor-pointer px-2.5 py-1 rounded-lg font-semibold text-indigo-700 hover:bg-white/60">
                 <input type="radio" name="empLeadType" value="BuyLead"> 💰 BuyLead (RFQ)
               </label>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
             
-            <!-- Paste Text Area -->
-            <div class="md:col-span-2 space-y-2">
-              <textarea id="smartPasteText" rows="4" oninput="autoParseLeadText()" placeholder="IndiaMART / TradeIndia se copy kiya hua text yahan paste karein...&#10;Jaise: 2026-09-29 08800008896 Aadit Kohli Oversized T-shirts Delhi" class="w-full p-3 text-xs bg-slate-50 border border-slate-300 rounded-xl outline-none focus:border-slate-900 focus:bg-white resize-none transition font-mono"></textarea>
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-slate-400 text-[11px]">Paste karte hi right side me clean fields auto-fill ho jayengi</span>
-                <button type="button" onclick="autoParseLeadText()" class="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium text-xs cursor-pointer transition">
-                  Re-Extract Clean Data
+            <!-- Left: Paste Text Area -->
+            <div class="lg:col-span-5 space-y-2.5 flex flex-col justify-between">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Raw Copied Text from Portal</span>
+                  <span class="text-[11px] text-slate-400 font-normal">IndiaMART "Copy Lead" / TradeIndia</span>
+                </label>
+                <textarea id="smartPasteText" rows="7" oninput="autoParseLeadText()" placeholder="IndiaMART ya TradeIndia se copy kiya hua message yahan paste karein...&#10;&#10;Jaise: 2026-09-29 08800008896 Aadit Kohli Kohli Garments aadit@gmail.com Oversized T-shirts 500 pcs Surat Gujarat India" class="w-full p-3 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-slate-900 focus:bg-white resize-none transition leading-relaxed"></textarea>
+              </div>
+
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                <button type="button" onclick="clearSmartPaste()" class="text-[11px] text-slate-500 hover:text-rose-600 font-medium cursor-pointer transition">Clear Box</button>
+                <button type="button" onclick="autoParseLeadText()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium text-xs cursor-pointer transition shadow-2xs">
+                  Re-Parse Clean Data
                 </button>
               </div>
             </div>
 
-            <!-- Extracted Clean Controls -->
-            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2.5 text-xs">
-              <div class="flex items-center justify-between font-semibold text-slate-700">
-                <span>Clean Data Preview</span>
-                <span id="quickStatusTag" class="text-[10px] text-emerald-600 font-bold hidden">Cleaned</span>
+            <!-- Right: Extracted Clean Controls (Structured Form) -->
+            <div class="lg:col-span-7 bg-slate-50/70 p-4 rounded-xl border border-slate-200/80 space-y-3 text-xs">
+              <div class="flex items-center justify-between border-b border-slate-200/60 pb-2">
+                <span class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Clean Field Separation</span>
+                <span id="quickStatusTag" class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold border border-emerald-200 hidden">Cleaned & Ready</span>
               </div>
 
-              <!-- Date & Brand in One Row -->
-              <div class="grid grid-cols-2 gap-2">
+              <!-- Row 1: Date & STRICT Assigned Brand -->
+              <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Date</label>
-                  <input type="text" id="smartFormDate" readonly class="w-full px-2 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 outline-none">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Date</label>
+                  <input type="text" id="smartFormDate" readonly class="w-full px-2.5 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 outline-none">
                 </div>
                 <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Brand</label>
-                  <select id="smartFormBrand" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
-                    <!-- Populated dynamically -->
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center justify-between">
+                    <span>Brand</span>
+                    <span class="text-[10px] text-slate-400 font-normal">Your assigned brands</span>
+                  </label>
+                  <select id="smartFormBrand" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none focus:border-slate-900">
+                    <!-- Populated strictly with current caller's assigned brands -->
                   </select>
                 </div>
               </div>
 
-              <!-- Name & Phone (Cleaned - No Date, No Phone in Name!) -->
-              <div class="grid grid-cols-2 gap-2">
+              <!-- Row 2: Client Person Name & Company / Firm Name -->
+              <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Client / Person Name</label>
-                  <input type="text" id="smartFormName" placeholder="Client Name" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Client / Person Name</label>
+                  <input type="text" id="smartFormClient" placeholder="e.g. Aadit Kohli" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none focus:border-slate-900">
                 </div>
                 <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Contact Number</label>
-                  <input type="text" id="smartFormPhone" placeholder="10 Digits" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 outline-none">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Company / Firm Name</label>
+                  <input type="text" id="smartFormCompany" placeholder="e.g. Kohli Garments (or -)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none focus:border-slate-900">
                 </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-2">
+              <!-- Row 3: Mobile Number & Email ID -->
+              <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">City</label>
-                  <input type="text" id="smartFormCity" placeholder="City" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Mobile Contact</label>
+                  <input type="text" id="smartFormPhone" placeholder="10 Digits (e.g. 9876543210)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 outline-none focus:border-slate-900">
                 </div>
                 <div>
-                  <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Source</label>
-                  <select id="smartFormSource" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Email ID</label>
+                  <input type="email" id="smartFormEmail" placeholder="client@email.com (or -)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 outline-none focus:border-slate-900">
+                </div>
+              </div>
+
+              <!-- Row 4: City, State, Country -->
+              <div class="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">City</label>
+                  <input type="text" id="smartFormCity" placeholder="City (e.g. Surat)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">State</label>
+                  <input type="text" id="smartFormState" placeholder="State (e.g. Gujarat)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Country</label>
+                  <input type="text" id="smartFormCountry" value="India" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+                </div>
+              </div>
+
+              <!-- Row 5: Clean Requirement & Deal Est Value (INR) -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Product Requirement (Cleaned)</label>
+                  <input type="text" id="smartFormReq" placeholder="e.g. Oversized T-shirts 500 pcs" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 outline-none focus:border-slate-900">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center justify-between">
+                    <span>Est. Value (₹)</span>
+                    <span class="text-[10px] text-slate-400">Optional</span>
+                  </label>
+                  <input type="number" id="smartFormEst" placeholder="0" value="0" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 outline-none focus:border-slate-900">
+                </div>
+              </div>
+
+              <!-- Row 6: Initial Call Status & Source -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Initial Call Status</label>
+                  <select id="smartFormStatus" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none focus:border-slate-900">
+                    <option value="New (Not Called)" selected>⏳ New (Not Called)</option>
+                    <option value="Ringing / No Answer">🔔 Ringing / No Answer</option>
+                    <option value="Call Busy / Call Later">⏳ Call Busy / Call Later</option>
+                    <option value="Incoming Off / Switched Off">📵 Incoming Off / Switched Off</option>
+                    <option value="Invalid / Wrong Number">❌ Invalid / Wrong Number</option>
+                    <option value="Not Interested">🚫 Not Interested</option>
+                    <option value="Interested / Quote Sent">💬 Interested / Quote Sent</option>
+                    <option value="Order Won / Converted">🏆 Order Won / Converted</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Inquiry Source</label>
+                  <select id="smartFormSource" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
                     <option>Indiamart</option>
                     <option>TradeIndia</option>
                     <option>Website</option>
                     <option>Meta Ads</option>
-                    <option>Cold Call</option>
+                    <option>Direct Call</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label class="block text-[11px] font-medium text-slate-500 mb-0.5">Requirement (Clean)</label>
-                <input type="text" id="smartFormReq" placeholder="Product requirement" class="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs outline-none">
+              <div class="pt-1">
+                <button type="button" onclick="saveSmartParsedLead()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-xs transition cursor-pointer shadow-xs flex items-center justify-center gap-2">
+                  <span>+ Save Lead to Calling Queue</span>
+                </button>
               </div>
-
-              <button type="button" onclick="saveSmartParsedLead()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs transition cursor-pointer shadow-xs">
-                + Save Clean Lead & Send WA
-              </button>
             </div>
 
           </div>
@@ -265,53 +328,53 @@
 
         <!-- Personal Clean KPI Strip -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
-            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Calls Logged</span>
+          <div class="bg-white border border-slate-200/90 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Calls Logged</span>
             <div id="empKpiTotal" class="text-2xl font-bold text-slate-900 mt-1">0</div>
             <span class="text-[11px] text-slate-400">Assigned leads</span>
           </div>
-          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
-            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">BuyLeads vs Direct</span>
+          <div class="bg-white border border-slate-200/90 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">BuyLeads vs Direct</span>
             <div id="empKpiBuyLeads" class="text-2xl font-bold text-indigo-600 mt-1">0</div>
-            <span class="text-[11px] text-slate-400">BuyLeads purchased</span>
+            <span class="text-[11px] text-slate-400">Paid RFQs</span>
           </div>
-          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
-            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Orders Won</span>
+          <div class="bg-white border border-slate-200/90 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Orders Won</span>
             <div id="empKpiWon" class="text-2xl font-bold text-emerald-600 mt-1">0</div>
-            <span class="text-[11px] text-emerald-600">Converted</span>
+            <span class="text-[11px] text-emerald-600 font-medium">Converted</span>
           </div>
-          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-2xs">
-            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Revenue Closed</span>
+          <div class="bg-white border border-slate-200/90 p-4 rounded-xl shadow-2xs">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Revenue Closed</span>
             <div id="empKpiRevenue" class="text-2xl font-bold text-slate-900 mt-1">₹0</div>
-            <span class="text-[11px] text-slate-400">Booked value</span>
+            <span class="text-[11px] text-slate-400">Quoted value</span>
           </div>
         </div>
 
         <!-- Clean Leads Table with Separated Columns -->
-        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-          <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+        <div class="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs">
+          <div class="p-4 border-b border-slate-200/80 flex justify-between items-center bg-slate-50/60">
             <div>
-              <h3 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">My Active Leads (Clean Display)</h3>
-              <p class="text-xs text-slate-500">Company Name, Contact, and Requirements are separated into their exact columns</p>
+              <h3 class="font-bold text-xs text-slate-900 uppercase tracking-wider">My Active Calling Queue</h3>
+              <p class="text-xs text-slate-500">Client Name, Company, Contact, Location, and Call Dispositions</p>
             </div>
-            <span id="empLeadCount" class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-medium">0 Leads</span>
+            <span id="empLeadCount" class="text-xs bg-white border border-slate-200 px-2.5 py-1 rounded-lg text-slate-700 font-semibold shadow-2xs">0 Leads</span>
           </div>
 
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
-                  <th class="py-2.5 px-3">Date</th>
-                  <th class="py-2.5 px-3">Brand</th>
-                  <th class="py-2.5 px-3">Source & Type</th>
-                  <th class="py-2.5 px-3 font-semibold text-slate-900">Client / Company Name</th>
-                  <th class="py-2.5 px-3 font-semibold text-slate-900">Contact Number</th>
-                  <th class="py-2.5 px-3">City</th>
-                  <th class="py-2.5 px-3 font-semibold text-slate-900">Requirement</th>
-                  <th class="py-2.5 px-3 text-right">Est. (₹)</th>
-                  <th class="py-2.5 px-3">Status</th>
-                  <th class="py-2.5 px-3">Converted?</th>
-                  <th class="py-2.5 px-3 text-center">Action</th>
+                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                  <th class="py-3 px-3">Date</th>
+                  <th class="py-3 px-3">Brand</th>
+                  <th class="py-3 px-3">Type</th>
+                  <th class="py-3 px-3">Client & Company</th>
+                  <th class="py-3 px-3">Contact & Email</th>
+                  <th class="py-3 px-3">Location</th>
+                  <th class="py-3 px-3">Requirement</th>
+                  <th class="py-3 px-3 text-right">Est. Deal (₹)</th>
+                  <th class="py-3 px-3">Call Disposition</th>
+                  <th class="py-3 px-3 text-center">Won?</th>
+                  <th class="py-3 px-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody id="empLeadsTableBody" class="divide-y divide-slate-100 text-slate-700">
@@ -567,17 +630,18 @@
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
-                    <th class="py-2.5 px-3">Date</th>
-                    <th class="py-2.5 px-3">Brand</th>
-                    <th class="py-2.5 px-3">Type</th>
-                    <th class="py-2.5 px-3">Company / Client</th>
-                    <th class="py-2.5 px-3">Contact</th>
-                    <th class="py-2.5 px-3">City</th>
-                    <th class="py-2.5 px-3">Assigned Caller</th>
-                    <th class="py-2.5 px-3 text-right">Est. (₹)</th>
-                    <th class="py-2.5 px-3">Status</th>
-                    <th class="py-2.5 px-3">Won?</th>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                    <th class="py-3 px-3">Date</th>
+                    <th class="py-3 px-3">Brand</th>
+                    <th class="py-3 px-3">Type</th>
+                    <th class="py-3 px-3">Client & Company</th>
+                    <th class="py-3 px-3">Contact & Email</th>
+                    <th class="py-3 px-3">Location</th>
+                    <th class="py-3 px-3">Requirement</th>
+                    <th class="py-3 px-3">Assigned Caller</th>
+                    <th class="py-3 px-3 text-right">Est. Deal (₹)</th>
+                    <th class="py-3 px-3">Call Disposition</th>
+                    <th class="py-3 px-3 text-center">Won?</th>
                   </tr>
                 </thead>
                 <tbody id="bossLeadsTableBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
@@ -702,12 +766,12 @@
     const todayDate = new Date().toISOString().slice(0, 10);
 
     const INITIAL_LEADS = [
-      { id: "L1", date: todayDate, brand: "C9 International", source: "TradeIndia", leadType: "BuyLead", company: "Sharma Traders", phone: "9876543210", city: "Delhi", req: "Seamless Lingerie & Leggings", qty: 50, est: 35000, status: "Interested", followup: "2026-10-02", converted: "Pending", callerId: "rahul", notes: "Catalog shared" },
-      { id: "L2", date: todayDate, brand: "Fabia", source: "Indiamart", leadType: "Direct Enquiry", company: "Rajesh Western Wear", phone: "9876501234", city: "Surat", req: "Fabia Tops Lot", qty: 150, est: 45000, status: "Connected", followup: "2026-10-01", converted: "Yes", callerId: "rahul", notes: "Advance received" },
-      { id: "L3", date: todayDate, brand: "Selfi Creation", source: "Indiamart", leadType: "Direct Enquiry", company: "Ananya Boutique", phone: "9823456781", city: "Jaipur", req: "Designer Kurti Collection", qty: 60, est: 36000, status: "Connected", followup: "2026-10-01", converted: "Yes", callerId: "priya", notes: "Order confirmed" },
-      { id: "L4", date: todayDate, brand: "Dresscode Clothing", source: "TradeIndia", leadType: "BuyLead", company: "Metro Retailers", phone: "9988776655", city: "Ahmedabad", req: "Formal Shirts", qty: 100, est: 55000, status: "Call Back Later", followup: "2026-10-01", converted: "Pending", callerId: "priya", notes: "Meeting pending" },
-      { id: "L5", date: todayDate, brand: "Arvind Industries", source: "Indiamart", leadType: "Direct Enquiry", company: "Apex Logistics & Tex", phone: "9811223344", city: "Mumbai", req: "Industrial Denim Fabric", qty: 500, est: 75000, status: "Connected", followup: "2026-10-01", converted: "Yes", callerId: "amit", notes: "Advance received" },
-      { id: "L6", date: todayDate, brand: "BS Food", source: "TradeIndia", leadType: "BuyLead", company: "Kiran Supermarket", phone: "9765432109", city: "Lucknow", req: "Food Packaging Pouches", qty: 1000, est: 28000, status: "Not Interested", followup: "-", converted: "No", callerId: "amit", notes: "Rate issue" }
+      { id: "L1", date: todayDate, brand: "C9 International", source: "TradeIndia", leadType: "BuyLead", clientName: "Manish Sharma", companyName: "Sharma Traders", company: "Manish Sharma (Sharma Traders)", phone: "9876543210", email: "sharma.manish@gmail.com", city: "Delhi", state: "Delhi", country: "India", req: "Seamless Lingerie & Leggings 100 pcs", qty: 100, est: 35000, status: "Interested / Quote Sent", followup: "2026-10-02", converted: "Pending", callerId: "rahul", notes: "Catalog shared" },
+      { id: "L2", date: todayDate, brand: "Fabia", source: "Indiamart", leadType: "Direct Enquiry", clientName: "Rajesh Patel", companyName: "Rajesh Western Wear", company: "Rajesh Patel (Rajesh Western Wear)", phone: "9876501234", email: "rajesh.patel@yahoo.com", city: "Surat", state: "Gujarat", country: "India", req: "Fabia Tops Lot 150 pcs", qty: 150, est: 45000, status: "Order Won / Converted", followup: "2026-10-01", converted: "Yes", callerId: "rahul", notes: "Advance received" },
+      { id: "L3", date: todayDate, brand: "Selfi Creation", source: "Indiamart", leadType: "Direct Enquiry", clientName: "Ananya Rathore", companyName: "Ananya Boutique", company: "Ananya Rathore (Ananya Boutique)", phone: "9823456781", email: "ananya.boutique@gmail.com", city: "Jaipur", state: "Rajasthan", country: "India", req: "Designer Kurti Festive Collection", qty: 60, est: 36000, status: "Order Won / Converted", followup: "2026-10-01", converted: "Yes", callerId: "priya", notes: "Order confirmed" },
+      { id: "L4", date: todayDate, brand: "Dresscode Clothing", source: "TradeIndia", leadType: "BuyLead", clientName: "Vikram Mehta", companyName: "Metro Retailers", company: "Vikram Mehta (Metro Retailers)", phone: "9988776655", email: "vikram@metroretail.in", city: "Ahmedabad", state: "Gujarat", country: "India", req: "Oversized Formal Shirts 200 pcs", qty: 200, est: 0, status: "Call Busy / Call Later", followup: "2026-10-01", converted: "Pending", callerId: "priya", notes: "Meeting pending" },
+      { id: "L5", date: todayDate, brand: "Arvind Industries", source: "Indiamart", leadType: "Direct Enquiry", clientName: "Sunil Agrawal", companyName: "Apex Logistics & Tex", company: "Sunil Agrawal (Apex Logistics & Tex)", phone: "9811223344", email: "sunil@apextextiles.com", city: "Mumbai", state: "Maharashtra", country: "India", req: "Industrial Denim Fabric 1000 mtrs", qty: 1000, est: 75000, status: "Order Won / Converted", followup: "2026-10-01", converted: "Yes", callerId: "amit", notes: "Advance received" },
+      { id: "L6", date: todayDate, brand: "BS Food", source: "TradeIndia", leadType: "BuyLead", clientName: "Kiran Gupta", companyName: "Kiran Supermarket", company: "Kiran Gupta (Kiran Supermarket)", phone: "9765432109", email: "-", city: "Lucknow", state: "Uttar Pradesh", country: "India", req: "Food Packaging Pouches 2000 pcs", qty: 2000, est: 0, status: "Not Interested", followup: "-", converted: "No", callerId: "amit", notes: "Rate issue" }
     ];
 
     let users = JSON.parse(localStorage.getItem("crm_users")) || INITIAL_USERS;
@@ -867,31 +931,52 @@
     }
 
     // ==============================================================
-    // ADVANCED SMART PARSER ENGINE (FIXES USER'S EXACT FORMAT ISSUE)
+    // 🌟 ADVANCED ENTERPRISE B2B PARSER & TELECALLING ENGINE
     // ==============================================================
+    function clearSmartPaste() {
+      document.getElementById("smartPasteText").value = "";
+      document.getElementById("smartFormClient").value = "";
+      document.getElementById("smartFormCompany").value = "";
+      document.getElementById("smartFormPhone").value = "";
+      document.getElementById("smartFormEmail").value = "";
+      document.getElementById("smartFormCity").value = "";
+      document.getElementById("smartFormState").value = "";
+      document.getElementById("smartFormCountry").value = "India";
+      document.getElementById("smartFormReq").value = "";
+      document.getElementById("smartFormEst").value = "0";
+      document.getElementById("smartFormStatus").value = "New (Not Called)";
+      document.getElementById("quickStatusTag").classList.add("hidden");
+    }
+
     function autoParseLeadText() {
       let raw = document.getElementById("smartPasteText").value.trim();
       if (!raw) return;
 
-      // 1. EXTRACT DATE (e.g. 2026-09-29 or 29-09-2026)
+      // 1. EXTRACT EMAIL ID (e.g. buyer@gmail.com)
+      let detectedEmail = "-";
+      const emailMatch = raw.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/);
+      if (emailMatch) {
+        detectedEmail = emailMatch[0];
+        raw = raw.replace(emailMatch[0], ' ').trim();
+      }
+      document.getElementById("smartFormEmail").value = detectedEmail;
+
+      // 2. EXTRACT DATE (e.g. 2026-09-29 or 29-09-2026)
       let detectedDate = todayDate;
       const dateMatch = raw.match(/\b(\d{4}[-/]\d{2}[-/]\d{2}|\d{2}[-/]\d{2}[-/]\d{4})\b/);
       if (dateMatch) {
         detectedDate = dateMatch[0];
-        // Remove date from raw text to prevent it from leaking into Name or Requirement
         raw = raw.replace(dateMatch[0], ' ').trim();
       }
       document.getElementById("smartFormDate").value = detectedDate;
 
-      // 2. EXTRACT PHONE NUMBER (10 or 11 digits, with optional leading 0 or +91)
+      // 3. EXTRACT 10-DIGIT MOBILE NUMBER (clean +91 or leading 0)
       let detectedPhone = "";
       const phoneMatch = raw.match(/(?:\+91[\-\s]?)?0?([6-9]\d{9})\b/);
       if (phoneMatch) {
-        detectedPhone = phoneMatch[1]; // grabs exact 10 digits
-        // Remove the entire phone token from raw text
+        detectedPhone = phoneMatch[1];
         raw = raw.replace(phoneMatch[0], ' ').trim();
       } else {
-        // Fallback for any sequence of 10 digits
         const numMatch = raw.match(/\b\d{10,11}\b/);
         if (numMatch) {
           detectedPhone = numMatch[0].slice(-10);
@@ -900,8 +985,45 @@
       }
       document.getElementById("smartFormPhone").value = detectedPhone;
 
-      // 3. EXTRACT CITY IF KNOWN INDIAN CITIES ARE PRESENT
-      const commonCities = ["Delhi", "Surat", "Mumbai", "Jaipur", "Ahmedabad", "Lucknow", "Kolkata", "Bangalore", "Pune", "Indore", "Kanpur", "Nagpur", "Agra", "Ludhiana", "Noida", "Gurgaon", "Faridabad", "Ghaziabad", "Hyderabad", "Chennai"];
+      // 4. EXTRACT COUNTRY (Defaults to India)
+      let detectedCountry = "India";
+      const countries = ["India", "UAE", "Dubai", "United Arab Emirates", "Nepal", "Bangladesh", "USA", "UK"];
+      for (const country of countries) {
+        const cRegex = new RegExp(`\\b${country}\\b`, 'i');
+        if (cRegex.test(raw)) {
+          detectedCountry = country;
+          raw = raw.replace(cRegex, ' ').trim();
+          break;
+        }
+      }
+      document.getElementById("smartFormCountry").value = detectedCountry;
+
+      // 5. EXTRACT STATE (Indian States & UTs)
+      const indianStates = [
+        "Gujarat", "Maharashtra", "Delhi", "Rajasthan", "Punjab", "Haryana", "Uttar Pradesh", "Madhya Pradesh",
+        "West Bengal", "Karnataka", "Tamil Nadu", "Bihar", "Telangana", "Andhra Pradesh", "Kerala", "Odisha",
+        "Assam", "Uttarakhand", "Jharkhand", "Chhattisgarh", "Himachal Pradesh", "Goa", "Jammu & Kashmir",
+        "Chandigarh", "UP", "MP"
+      ];
+      let detectedState = "";
+      for (const st of indianStates) {
+        const stRegex = new RegExp(`\\b${st}\\b`, 'i');
+        if (stRegex.test(raw)) {
+          detectedState = st === "UP" ? "Uttar Pradesh" : (st === "MP" ? "Madhya Pradesh" : st);
+          raw = raw.replace(stRegex, ' ').trim();
+          break;
+        }
+      }
+      document.getElementById("smartFormState").value = detectedState;
+
+      // 6. EXTRACT CITY
+      const commonCities = [
+        "Delhi", "Surat", "Mumbai", "Jaipur", "Ahmedabad", "Lucknow", "Kolkata", "Bangalore", "Bengaluru",
+        "Pune", "Indore", "Kanpur", "Nagpur", "Agra", "Ludhiana", "Noida", "Gurgaon", "Gurugram",
+        "Faridabad", "Ghaziabad", "Hyderabad", "Chennai", "Varanasi", "Meerut", "Rajkot", "Vadodara",
+        "Coimbatore", "Amritsar", "Jalandhar", "Bhopal", "Patna", "Ranchi", "Chandigarh", "Panipat",
+        "Tirupur", "Bhilwara", "Gwalior", "Jodhpur", "Udaipur"
+      ];
       let detectedCity = "-";
       for (const city of commonCities) {
         const cityRegex = new RegExp(`\\b${city}\\b`, 'i');
@@ -913,40 +1035,43 @@
       }
       document.getElementById("smartFormCity").value = detectedCity;
 
-      // 4. DETECT EXPLICIT LABELS (IF AVAILABLE IN MULTILINE FORMAT)
-      let detectedName = "";
+      // 7. DETECT EXPLICIT LABELS (Multiline format from IndiaMART / TradeIndia)
+      let detectedClient = "";
+      let detectedCompany = "";
       let detectedReq = "";
 
-      const nameLabelMatch = raw.match(/(?:Buyer Name|Name|Sender|Contact Person|Customer)[\s:]+([^\r\n,]+)/i);
-      const reqLabelMatch = raw.match(/(?:Product|Requirement|Details|Enquiry|Looking for)[\s:]+([^\r\n]+)/i);
+      const clientMatch = raw.match(/(?:Buyer Name|Contact Person|Sender Name|Customer Name|Person Name)[\s:]+([^\r\n,]+)/i);
+      const companyMatch = raw.match(/(?:Company Name|Company|Firm Name|Firm|Business Name)[\s:]+([^\r\n,]+)/i);
+      const reqMatch = raw.match(/(?:Product Name|Product|Requirement|Details|Looking for|Enquiry)[\s:]+([^\r\n]+)/i);
 
-      if (nameLabelMatch) {
-        detectedName = nameLabelMatch[1].trim();
-        raw = raw.replace(nameLabelMatch[0], ' ').trim();
+      if (clientMatch) {
+        detectedClient = clientMatch[1].trim();
+        raw = raw.replace(clientMatch[0], ' ').trim();
+      }
+      if (companyMatch) {
+        detectedCompany = companyMatch[1].trim();
+        raw = raw.replace(companyMatch[0], ' ').trim();
+      }
+      if (reqMatch) {
+        detectedReq = reqMatch[1].trim();
+        raw = raw.replace(reqMatch[0], ' ').trim();
       }
 
-      if (reqLabelMatch) {
-        detectedReq = reqLabelMatch[1].trim();
-        raw = raw.replace(reqLabelMatch[0], ' ').trim();
-      }
-
-      // 5. UNSTRUCTURED SINGLE-LINE PARSER (e.g. "Aadit Kohli Oversized T-shirts...")
-      if (!detectedName || !detectedReq) {
-        // Clean multiple spaces
+      // 8. UNSTRUCTURED SINGLE-LINE PARSING
+      if (!detectedClient || !detectedReq) {
         const cleanTokens = raw.replace(/\s+/g, ' ').trim().split(' ').filter(t => t.length > 0);
 
         if (cleanTokens.length > 0) {
           const productKeywords = [
-            "oversized", "shirt", "shirts", "t-shirt", "t-shirts", "tshirt", "tshirts", "trouser", "trousers", "formal", "casual", "jeans", "pant", "pants",
-            "kurti", "kurtis", "kurta", "rayon", "ethnic", "anarkali", "palazzo", "dupatta",
-            "top", "tops", "tunic", "tunics", "western", "dress", "dresses", "co-ord",
-            "lingerie", "bra", "panty", "seamless", "legging", "leggings", "innerwear",
-            "denim", "fabric", "fabrics", "cotton", "textile", "textiles", "shirting", "suiting", "yarn",
-            "food", "spice", "spices", "makhana", "pouch", "pouches", "grocery", "packaging", "rice",
+            "oversized", "shirt", "shirts", "t-shirt", "t-shirts", "tshirt", "tshirts", "trouser", "trousers",
+            "formal", "casual", "jeans", "pant", "pants", "kurti", "kurtis", "kurta", "rayon", "ethnic",
+            "anarkali", "palazzo", "dupatta", "top", "tops", "tunic", "tunics", "western", "dress", "dresses",
+            "co-ord", "lingerie", "bra", "panty", "seamless", "legging", "leggings", "innerwear", "denim",
+            "fabric", "fabrics", "cotton", "textile", "textiles", "shirting", "suiting", "yarn", "food",
+            "spice", "spices", "makhana", "pouch", "pouches", "grocery", "packaging", "rice",
             "enquiry", "inquiry", "requirement", "looking", "need", "wanted", "wholesale", "quantity", "pcs", "piece", "pieces"
           ];
 
-          // Find first token that matches a product keyword
           let splitIdx = -1;
           for (let i = 0; i < cleanTokens.length; i++) {
             const tokenClean = cleanTokens[i].toLowerCase().replace(/[^a-z\-]/g, '');
@@ -956,37 +1081,71 @@
             }
           }
 
+          let namePartTokens = [];
           if (splitIdx > 0) {
-            // Words before product keyword = Name
-            detectedName = cleanTokens.slice(0, splitIdx).join(' ');
-            // Words from product keyword onwards = Requirement
+            namePartTokens = cleanTokens.slice(0, splitIdx);
             detectedReq = cleanTokens.slice(splitIdx).join(' ');
           } else if (cleanTokens.length >= 3) {
-            // Fallback: First 2 words as Name, rest as Requirement
-            detectedName = cleanTokens.slice(0, 2).join(' ');
+            namePartTokens = cleanTokens.slice(0, 2);
             detectedReq = cleanTokens.slice(2).join(' ');
           } else if (cleanTokens.length >= 2) {
-            detectedName = cleanTokens.slice(0, 1).join(' ');
+            namePartTokens = [cleanTokens[0]];
             detectedReq = cleanTokens.slice(1).join(' ');
           } else {
-            detectedName = cleanTokens[0];
+            namePartTokens = [cleanTokens[0]];
             detectedReq = "Wholesale Requirement";
+          }
+
+          // Check for Company Markers in namePartTokens
+          const companyMarkers = [
+            "enterprises", "textiles", "garments", "traders", "clothing", "creations", "industries",
+            "solutions", "agency", "pvt", "ltd", "llp", "boutique", "store", "shop", "collection",
+            "foods", "fashion", "export", "fabrics", "mill", "mills", "wear", "apparels"
+          ];
+
+          if (!detectedCompany) {
+            let compIdx = -1;
+            for (let i = 0; i < namePartTokens.length; i++) {
+              if (companyMarkers.includes(namePartTokens[i].toLowerCase().replace(/[^a-z]/g, ''))) {
+                compIdx = i;
+                break;
+              }
+            }
+
+            if (compIdx > 0) {
+              detectedClient = namePartTokens.slice(0, compIdx).join(' ');
+              detectedCompany = namePartTokens.slice(compIdx).join(' ');
+            } else if (namePartTokens.length >= 2 && !detectedClient) {
+              detectedClient = namePartTokens.join(' ');
+              detectedCompany = "-";
+            } else if (!detectedClient) {
+              detectedClient = namePartTokens.join(' ');
+              detectedCompany = "-";
+            }
+          } else if (!detectedClient) {
+            detectedClient = namePartTokens.join(' ');
           }
         }
       }
 
-      // Clean up Name: Strip any stray numbers or symbols
-      detectedName = detectedName.replace(/[0-9\-_:;]/g, '').trim();
-      if (!detectedName) detectedName = "Direct Buyer";
+      // Clean Client Name & Company
+      detectedClient = (detectedClient || "Direct Buyer").replace(/[0-9\-_:;]/g, '').trim();
+      detectedCompany = (detectedCompany || "-").trim();
+      detectedReq = (detectedReq || "Product Wholesale Inquiry").trim();
 
-      // Clean up Requirement: Strip redundant info
-      detectedReq = detectedReq.trim();
-      if (!detectedReq) detectedReq = "Product Wholesale Inquiry";
-
-      document.getElementById("smartFormName").value = detectedName;
+      document.getElementById("smartFormClient").value = detectedClient;
+      document.getElementById("smartFormCompany").value = detectedCompany;
       document.getElementById("smartFormReq").value = detectedReq;
 
-      // 6. BRAND AUTO-MATCH FROM CLEAN REQUIREMENT
+      // 9. ESTIMATED VALUE: Extract explicit budget if present, else default to 0
+      let detectedEst = 0;
+      const amountMatch = raw.match(/(?:Rs\.?|INR|₹)\s*([0-9,]+)/i);
+      if (amountMatch) {
+        detectedEst = Number(amountMatch[1].replace(/,/g, '')) || 0;
+      }
+      document.getElementById("smartFormEst").value = detectedEst;
+
+      // 10. STRICT BRAND AUTO-MATCH (RESTRICTED ONLY TO CURRENT CALLER'S ASSIGNED BRANDS!)
       const reqLower = detectedReq.toLowerCase();
       let matchedBrand = "";
 
@@ -1004,24 +1163,10 @@
         matchedBrand = "BS Food";
       }
 
-      // If matched brand is in dropdown, select it. If not in caller's brands, add it dynamically so it's not miscategorized!
+      // STRICTLY check against caller's assigned brands:
       const brandDropdown = document.getElementById("smartFormBrand");
-      if (matchedBrand) {
-        let found = false;
-        for (let i = 0; i < brandDropdown.options.length; i++) {
-          if (brandDropdown.options[i].value === matchedBrand) {
-            brandDropdown.selectedIndex = i;
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          const opt = document.createElement("option");
-          opt.value = matchedBrand;
-          opt.text = `${matchedBrand} (Auto-detected)`;
-          brandDropdown.add(opt);
-          brandDropdown.value = matchedBrand;
-        }
+      if (matchedBrand && currentUser.brands.includes(matchedBrand)) {
+        brandDropdown.value = matchedBrand;
       }
 
       // Auto detect source if mentioned
@@ -1034,13 +1179,19 @@
 
     function saveSmartParsedLead() {
       const date = document.getElementById("smartFormDate").value || todayDate;
-      const company = document.getElementById("smartFormName").value.trim() || "Customer Lead";
+      const clientName = document.getElementById("smartFormClient").value.trim() || "Customer Lead";
+      const companyName = document.getElementById("smartFormCompany").value.trim() || "-";
       const phone = document.getElementById("smartFormPhone").value.trim();
+      const email = document.getElementById("smartFormEmail").value.trim() || "-";
       const city = document.getElementById("smartFormCity").value.trim() || "-";
+      const state = document.getElementById("smartFormState").value.trim() || "";
+      const country = document.getElementById("smartFormCountry").value.trim() || "India";
       const brand = document.getElementById("smartFormBrand").value;
       const source = document.getElementById("smartFormSource").value;
       const req = document.getElementById("smartFormReq").value.trim() || "Product Inquiry";
-      
+      const est = Number(document.getElementById("smartFormEst").value) || 0;
+      const status = document.getElementById("smartFormStatus").value;
+
       const leadTypeRadio = document.querySelector('input[name="empLeadType"]:checked');
       const leadType = leadTypeRadio ? leadTypeRadio.value : "Direct Enquiry";
 
@@ -1055,15 +1206,20 @@
         brand: brand,
         source: source,
         leadType: leadType,
-        company: company,
+        clientName: clientName,
+        companyName: companyName,
+        company: companyName !== "-" ? `${clientName} (${companyName})` : clientName,
         phone: phone,
+        email: email,
         city: city,
+        state: state,
+        country: country,
         req: req,
         qty: 1,
-        est: 25000,
-        status: "Interested",
+        est: est,
+        status: status,
         followup: "-",
-        converted: "Pending",
+        converted: status === "Order Won / Converted" ? "Yes" : "Pending",
         callerId: currentUser.id,
         notes: `Logged via Smart Extractor (${leadType})`
       };
@@ -1071,18 +1227,11 @@
       leads.unshift(newLead);
       saveState();
 
-      // Clear input box
-      document.getElementById("smartPasteText").value = "";
-      document.getElementById("smartFormName").value = "";
-      document.getElementById("smartFormPhone").value = "";
-      document.getElementById("smartFormCity").value = "";
-      document.getElementById("smartFormReq").value = "";
-      document.getElementById("quickStatusTag").classList.add("hidden");
-
+      clearSmartPaste();
       renderEmployeeDashboard();
 
       // Instant WhatsApp prompt
-      if (confirm(`✅ Clean Lead Save Ho Gayi!\n\nName: ${company}\nMobile: ${phone}\nBrand: ${brand}\nRequirement: ${req}\n\nKya aap abhi WhatsApp message bhejna chahte hain?`)) {
+      if (confirm(`✅ Clean Lead Save Ho Gayi!\n\nClient: ${clientName}\nCompany: ${companyName}\nMobile: ${phone}\nBrand: ${brand}\nRequirement: ${req}\nStatus: ${status}\n\nKya aap abhi WhatsApp message bhejna chahte hain?`)) {
         sendCustomerWhatsApp(newLead.id);
       }
     }
@@ -1095,7 +1244,7 @@
       const template = templates[lead.brand] || "Namaste {name} ji, hum {brand} se baat kar rahe hain. Aapki {source} par inquiry aayi thi. Best wholesale catalog ke liye connect karein.";
 
       let message = template
-        .replace(/{name}/g, lead.company)
+        .replace(/{name}/g, lead.clientName || lead.company)
         .replace(/{brand}/g, lead.brand)
         .replace(/{req}/g, lead.req)
         .replace(/{source}/g, lead.source);
@@ -1105,6 +1254,66 @@
 
       const waUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`;
       window.open(waUrl, "_blank");
+    }
+
+    // DISPOSITION COLOR STYLING HELPER
+    function getStatusStyle(status) {
+      switch(status) {
+        case "New (Not Called)": return "bg-slate-100 text-slate-700 border-slate-300";
+        case "Ringing / No Answer": return "bg-amber-50 text-amber-800 border-amber-300";
+        case "Call Busy / Call Later": return "bg-sky-50 text-sky-800 border-sky-300";
+        case "Incoming Off / Switched Off": return "bg-slate-200 text-slate-700 border-slate-400";
+        case "Invalid / Wrong Number": return "bg-rose-50 text-rose-800 border-rose-300";
+        case "Not Interested": return "bg-red-50 text-red-800 border-red-300";
+        case "Interested / Quote Sent": return "bg-emerald-50 text-emerald-800 border-emerald-300";
+        case "Order Won / Converted": return "bg-emerald-600 text-white border-emerald-700 font-bold";
+        default: return "bg-slate-100 text-slate-700 border-slate-300";
+      }
+    }
+
+    // DIRECT STATUS UPDATE FROM TABLE SELECTOR
+    function updateLeadStatus(leadId, newStatus) {
+      const lead = leads.find(l => l.id === leadId);
+      if (!lead) return;
+
+      lead.status = newStatus;
+      if (newStatus === "Order Won / Converted") {
+        lead.converted = "Yes";
+        if (!lead.est || Number(lead.est) === 0) {
+          const val = prompt("🏆 Badhai ho! Deal finalize hui. Final deal order value (₹ INR) enter karein:", "25000");
+          if (val) lead.est = Number(val.replace(/[^0-9]/g, '')) || 0;
+        }
+      } else if (newStatus === "Not Interested") {
+        lead.converted = "No";
+      } else {
+        if (lead.converted === "Yes") lead.converted = "Pending";
+      }
+
+      saveState();
+      if (currentUser.role === "admin") renderAdminDashboard();
+      else renderEmployeeDashboard();
+    }
+
+    // INLINE EDIT ESTIMATE DEAL VALUE
+    function editLeadEst(leadId) {
+      const lead = leads.find(l => l.id === leadId);
+      if (!lead) return;
+      const val = prompt(`Enter Quoted / Deal Value (₹) for ${lead.clientName || lead.company}:`, lead.est || "0");
+      if (val !== null) {
+        lead.est = Number(val.replace(/[^0-9]/g, '')) || 0;
+        saveState();
+        if (currentUser.role === "admin") renderAdminDashboard();
+        else renderEmployeeDashboard();
+      }
+    }
+
+    function deleteLead(leadId) {
+      if (confirm("Kya aap sach me is lead ko delete karna chahte hain?")) {
+        leads = leads.filter(l => l.id !== leadId);
+        saveState();
+        if (currentUser.role === "admin") renderAdminDashboard();
+        else renderEmployeeDashboard();
+      }
     }
 
     // TEMPLATE EDITOR LOGIC
@@ -1141,7 +1350,17 @@
     function toggleWonLead(leadId) {
       const lead = leads.find(l => l.id === leadId);
       if (lead) {
-        lead.converted = lead.converted === "Yes" ? "Pending" : "Yes";
+        if (lead.converted !== "Yes") {
+          lead.converted = "Yes";
+          lead.status = "Order Won / Converted";
+          if (!lead.est || Number(lead.est) === 0) {
+            const val = prompt("🏆 Order Won! Deal order value (₹ INR) enter karein:", "25000");
+            if (val) lead.est = Number(val.replace(/[^0-9]/g, '')) || 0;
+          }
+        } else {
+          lead.converted = "Pending";
+          lead.status = "Interested / Quote Sent";
+        }
         saveState();
         if (currentUser.role === "admin") renderAdminDashboard();
         else renderEmployeeDashboard();
@@ -1154,9 +1373,10 @@
       
       const brandContainer = document.getElementById("empBrandBadges");
       brandContainer.innerHTML = currentUser.brands.map(b => 
-        `<span class="px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-700 border border-slate-200 font-medium">${b}</span>`
+        `<span class="px-2.5 py-1 rounded-lg text-xs bg-slate-100 text-slate-800 border border-slate-200/90 font-semibold shadow-2xs">${b}</span>`
       ).join("");
 
+      // Populate brand selector strictly with current caller's assigned brands
       const selectEl = document.getElementById("smartFormBrand");
       selectEl.innerHTML = currentUser.brands.map(b => `<option value="${b}">${b}</option>`).join("");
 
@@ -1177,39 +1397,73 @@
       tbody.innerHTML = "";
 
       if (myLeads.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400">No leads available for your brands.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">Aapke assigned brands ke liye abhi koi leads nahi hain. Upar Smart Extractor se lead add karein!</td></tr>`;
         return;
       }
 
       myLeads.forEach(l => {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50/70 transition";
+        tr.className = "hover:bg-slate-50/80 transition";
         
         let typeBadge = l.leadType === "BuyLead" 
           ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">BuyLead</span>`
           : `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Enquiry</span>`;
 
-        let convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span>`;
-        if (l.converted === "Yes") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Won</span>`;
-        if (l.converted === "No") convBadge = `<span class="px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">Lost</span>`;
+        let convBadge = `<span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">Pending</span>`;
+        if (l.converted === "Yes") convBadge = `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Won</span>`;
+        if (l.converted === "No") convBadge = `<span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200">Lost</span>`;
+
+        const displayClient = l.clientName || l.company.split('(')[0].trim();
+        const displayCompany = l.companyName && l.companyName !== '-' 
+          ? l.companyName 
+          : (l.company.includes('(') ? l.company.split('(')[1].replace(')', '').trim() : '-');
+
+        const estDisplay = Number(l.est) > 0 
+          ? `<span onclick="editLeadEst('${l.id}')" class="font-bold text-slate-900 cursor-pointer hover:text-indigo-600" title="Click to edit deal amount">₹${Number(l.est).toLocaleString('en-IN')}</span>`
+          : `<button onclick="editLeadEst('${l.id}')" class="text-slate-400 hover:text-indigo-600 italic text-[11px] underline cursor-pointer">+ Quote Rate</button>`;
+
+        const locationDisplay = l.state 
+          ? `${l.city || '-'}, ${l.state}` 
+          : (l.city || '-');
 
         tr.innerHTML = `
-          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
-          <td class="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">${l.brand}</td>
-          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.source} ${typeBadge}</td>
-          <td class="py-2.5 px-3 font-semibold text-slate-900">${l.company}</td>
-          <td class="py-2.5 px-3 font-mono font-medium text-slate-800">${l.phone}</td>
-          <td class="py-2.5 px-3 text-slate-500">${l.city}</td>
-          <td class="py-2.5 px-3 text-slate-700 max-w-xs truncate">${l.req}</td>
-          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${Number(l.est).toLocaleString('en-IN')}</td>
-          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">${l.status}</span></td>
-          <td class="py-2.5 px-3">${convBadge}</td>
-          <td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1.5">
-            <button onclick="sendCustomerWhatsApp('${l.id}')" class="text-xs px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium shadow-2xs inline-flex items-center gap-1 cursor-pointer">
+          <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
+          <td class="py-3 px-3 font-bold text-slate-900 whitespace-nowrap">${l.brand}</td>
+          <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${l.source} ${typeBadge}</td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-slate-900 leading-tight">${displayClient}</div>
+            <div class="text-[11px] text-slate-400 font-medium">${displayCompany !== '-' ? '🏢 ' + displayCompany : 'Individual Buyer'}</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <div class="font-mono font-bold text-slate-900 text-xs">${l.phone}</div>
+            <div class="text-[10px] text-slate-400 truncate max-w-[130px]">${l.email && l.email !== '-' ? '✉️ ' + l.email : ''}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-600 whitespace-nowrap">
+            <div class="font-medium text-slate-800">${locationDisplay}</div>
+            <div class="text-[10px] text-slate-400">${l.country && l.country !== 'India' ? l.country : ''}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-700 max-w-xs font-medium truncate" title="${l.req}">${l.req}</td>
+          <td class="py-3 px-3 text-right whitespace-nowrap">${estDisplay}</td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <select onchange="updateLeadStatus('${l.id}', this.value)" class="px-2 py-1 rounded-lg text-xs font-semibold border ${getStatusStyle(l.status)} outline-none cursor-pointer">
+              <option value="New (Not Called)" ${l.status === 'New (Not Called)' ? 'selected' : ''}>⏳ New (Not Called)</option>
+              <option value="Ringing / No Answer" ${l.status === 'Ringing / No Answer' ? 'selected' : ''}>🔔 Ringing / No Answer</option>
+              <option value="Call Busy / Call Later" ${l.status === 'Call Busy / Call Later' ? 'selected' : ''}>⏳ Call Busy / Call Later</option>
+              <option value="Incoming Off / Switched Off" ${l.status === 'Incoming Off / Switched Off' ? 'selected' : ''}>📵 Incoming Off / Switched Off</option>
+              <option value="Invalid / Wrong Number" ${l.status === 'Invalid / Wrong Number' ? 'selected' : ''}>❌ Invalid / Wrong Number</option>
+              <option value="Not Interested" ${l.status === 'Not Interested' ? 'selected' : ''}>🚫 Not Interested</option>
+              <option value="Interested / Quote Sent" ${l.status === 'Interested / Quote Sent' ? 'selected' : ''}>💬 Interested / Quote Sent</option>
+              <option value="Order Won / Converted" ${l.status === 'Order Won / Converted' ? 'selected' : ''}>🏆 Order Won / Converted</option>
+            </select>
+          </td>
+          <td class="py-3 px-3 text-center whitespace-nowrap">${convBadge}</td>
+          <td class="py-3 px-3 text-center whitespace-nowrap space-x-1.5">
+            <button onclick="sendCustomerWhatsApp('${l.id}')" class="text-xs px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-2xs inline-flex items-center gap-1 cursor-pointer transition">
               <span>💬</span> Send WA
             </button>
-            <a href="tel:${l.phone}" class="text-xs px-2 py-1 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded font-medium inline-block">Call</a>
-            <button onclick="toggleWonLead('${l.id}')" class="text-[11px] px-1.5 py-1 rounded border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium cursor-pointer">${l.converted === 'Yes' ? 'Undo' : 'Won'}</button>
+            <a href="tel:${l.phone}" class="text-xs px-2 py-1 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg font-medium inline-block transition">Call</a>
+            <button onclick="toggleWonLead('${l.id}')" class="text-[11px] px-2 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 font-medium cursor-pointer transition">${l.converted === 'Yes' ? 'Undo' : 'Won'}</button>
+            <button onclick="deleteLead('${l.id}')" class="text-[11px] px-1.5 py-1 text-slate-400 hover:text-rose-600 cursor-pointer" title="Delete Lead">&times;</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1391,13 +1645,18 @@
           brand: matchedBrand,
           source: sourceTag.split(" ")[0],
           leadType: isBuyLead ? "BuyLead" : "Direct Enquiry",
+          clientName: company,
+          companyName: "-",
           company: company,
           phone: phone,
+          email: "-",
           city: city,
+          state: "",
+          country: "India",
           req: req,
           qty: 1,
           est: est,
-          status: "Interested",
+          status: "New (Not Called)",
           followup: "-",
           converted: "Pending",
           callerId: callerId,
@@ -1539,17 +1798,41 @@
         const caller = users.find(u => u.id === l.callerId) || { name: "Auto-Assigned" };
         const tr = document.createElement("tr");
         tr.className = "hover:bg-slate-50/70 transition";
+
+        const displayClient = l.clientName || l.company.split('(')[0].trim();
+        const displayCompany = l.companyName && l.companyName !== '-' 
+          ? l.companyName 
+          : (l.company.includes('(') ? l.company.split('(')[1].replace(')', '').trim() : '-');
+
+        const locationDisplay = l.state 
+          ? `${l.city || '-'}, ${l.state}` 
+          : (l.city || '-');
+
+        const estVal = Number(l.est) > 0 ? `₹${Number(l.est).toLocaleString('en-IN')}` : `<span class="text-slate-400 italic">Unquoted</span>`;
+
         tr.innerHTML = `
-          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
-          <td class="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">${l.brand}</td>
-          <td class="py-2.5 px-3 text-slate-600"><span class="px-1.5 py-0.5 rounded text-[10px] font-medium ${l.leadType === 'BuyLead' ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-100'}">${l.leadType || 'Enquiry'}</span></td>
-          <td class="py-2.5 px-3 font-semibold text-slate-900">${l.company}</td>
-          <td class="py-2.5 px-3 font-mono text-slate-600">${l.phone}</td>
-          <td class="py-2.5 px-3 text-slate-500">${l.city}</td>
-          <td class="py-2.5 px-3 text-slate-700 font-medium">${caller.name}</td>
-          <td class="py-2.5 px-3 text-right font-medium text-slate-900">₹${Number(l.est).toLocaleString('en-IN')}</td>
-          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 text-[11px]">${l.status}</span></td>
-          <td class="py-2.5 px-3 font-semibold ${l.converted === 'Yes' ? 'text-emerald-600' : 'text-slate-500'}">${l.converted}</td>
+          <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
+          <td class="py-3 px-3 font-bold text-slate-900 whitespace-nowrap">${l.brand}</td>
+          <td class="py-3 px-3 text-slate-600 whitespace-nowrap"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${l.leadType === 'BuyLead' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">${l.leadType || 'Enquiry'}</span></td>
+          <td class="py-3 px-3">
+            <div class="font-bold text-slate-900 leading-tight">${displayClient}</div>
+            <div class="text-[11px] text-slate-400 font-medium">${displayCompany !== '-' ? '🏢 ' + displayCompany : 'Individual Buyer'}</div>
+          </td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <div class="font-mono font-bold text-slate-900 text-xs">${l.phone}</div>
+            <div class="text-[10px] text-slate-400 truncate max-w-[130px]">${l.email && l.email !== '-' ? '✉️ ' + l.email : ''}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-600 whitespace-nowrap">
+            <div class="font-medium text-slate-800">${locationDisplay}</div>
+            <div class="text-[10px] text-slate-400">${l.country && l.country !== 'India' ? l.country : ''}</div>
+          </td>
+          <td class="py-3 px-3 text-slate-700 font-medium max-w-xs truncate" title="${l.req}">${l.req}</td>
+          <td class="py-3 px-3 text-slate-700 font-semibold whitespace-nowrap">${caller.name}</td>
+          <td class="py-3 px-3 text-right font-bold text-slate-900 whitespace-nowrap">${estVal}</td>
+          <td class="py-3 px-3 whitespace-nowrap">
+            <span class="px-2 py-1 rounded-lg text-xs font-semibold border ${getStatusStyle(l.status)}">${l.status}</span>
+          </td>
+          <td class="py-3 px-3 text-center font-bold ${l.converted === 'Yes' ? 'text-emerald-600' : 'text-slate-400'}">${l.converted}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1622,11 +1905,16 @@
 
     function exportAllCSV() {
       let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Date,Brand,Source,Lead Type,Company/Person,Contact Number,City,Requirement,Qty,Est. Value (INR),Call Status,Next Follow-up,Order Converted?,Caller Name,Notes\n";
+      csvContent += "Date,Brand,Source,Lead Type,Client Name,Company/Firm,Contact Number,Email,City,State,Country,Requirement,Est. Value (INR),Call Disposition,Order Converted?,Caller Name,Notes\n";
 
       leads.forEach(l => {
         const caller = users.find(u => u.id === l.callerId) || { name: "N/A" };
-        csvContent += `"${l.date}","${l.brand}","${l.source}","${l.leadType || 'Enquiry'}","${l.company}","${l.phone}","${l.city}","${l.req}",${l.qty},${l.est},"${l.status}","${l.followup}","${l.converted}","${caller.name}","${l.notes}"\n`;
+        const client = l.clientName || l.company;
+        const comp = l.companyName || "-";
+        const email = l.email || "-";
+        const state = l.state || "-";
+        const country = l.country || "India";
+        csvContent += `"${l.date}","${l.brand}","${l.source}","${l.leadType || 'Enquiry'}","${client}","${comp}","${l.phone}","${email}","${l.city}","${state}","${country}","${l.req}",${l.est},"${l.status}","${l.converted}","${caller.name}","${l.notes}"\n`;
       });
 
       const encodedUri = encodeURI(csvContent);
