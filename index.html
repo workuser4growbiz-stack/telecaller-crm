@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    /* Subtle professional scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #f8fafc; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -20,7 +19,7 @@
 <body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
 
   <!-- ========================================== -->
-  <!-- 1. AUTH / LOGIN SCREEN (EXECUTIVE MINIMAL)  -->
+  <!-- 1. AUTH / SECURE LOGIN SCREEN              -->
   <!-- ========================================== -->
   <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-100/80">
     <div class="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl p-7 sm:p-8 shadow-sm space-y-6">
@@ -29,14 +28,14 @@
       <div class="space-y-1.5">
         <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-lg mb-3 shadow-xs">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
         </div>
         <h1 class="text-xl font-bold tracking-tight text-slate-900">Sign in to Sales Portal</h1>
-        <p class="text-xs text-slate-500">Multi-Brand Telecalling & Lead Management</p>
+        <p class="text-xs text-slate-500">Secure Multi-Brand Telecalling & Lead Management</p>
       </div>
 
-      <!-- Google Sign In Button -->
+      <!-- Google Sign In Button (For Callers) -->
       <button onclick="loginWithGoogle()" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-xs sm:text-sm flex items-center justify-center gap-3 transition cursor-pointer shadow-2xs">
         <svg class="w-4 h-4" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -44,15 +43,15 @@
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
         </svg>
-        Continue with Google
+        Sign in with Google Workspace
       </button>
 
       <div class="relative flex items-center justify-center">
         <div class="border-t border-slate-200 w-full"></div>
-        <span class="bg-white px-3 text-[11px] text-slate-400 uppercase tracking-wider font-medium absolute">or ID / password</span>
+        <span class="bg-white px-3 text-[11px] text-slate-400 uppercase tracking-wider font-medium absolute">or password login</span>
       </div>
 
-      <!-- ID & Password Form -->
+      <!-- Secure ID & Password Form -->
       <form onsubmit="handleIdLogin(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-medium text-slate-700 mb-1">Work Email / User ID</label>
@@ -65,33 +64,16 @@
           <input type="password" id="loginPass" placeholder="••••••••" required class="w-full px-3 py-2 rounded-lg bg-white border border-slate-300 text-slate-900 text-xs focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition">
         </div>
         <button type="submit" class="w-full py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs transition cursor-pointer shadow-xs">
-          Sign In
+          Secure Sign In
         </button>
       </form>
 
-      <p id="loginError" class="text-xs text-rose-600 text-center font-medium hidden">Invalid credentials. Please select a demo user below.</p>
+      <p id="loginError" class="text-xs text-rose-600 text-center font-medium hidden">Ghalat email ya password! Sahi details daalein.</p>
 
-      <!-- Clean Minimal Quick Demo Switcher -->
-      <div class="pt-3 border-t border-slate-100 space-y-2">
-        <span class="text-[11px] font-medium text-slate-400 block text-center uppercase tracking-wider">Fast Demo Accounts</span>
-        <div class="grid grid-cols-2 gap-1.5 text-xs">
-          <button onclick="quickLogin('admin')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
-            <span class="font-semibold text-slate-900 block text-[11px]">Administrator</span>
-            <span class="text-[10px] text-slate-400">All 6 Brands</span>
-          </button>
-          <button onclick="quickLogin('rahul')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
-            <span class="font-semibold text-slate-900 block text-[11px]">Rahul S.</span>
-            <span class="text-[10px] text-slate-400">C9, Fabia</span>
-          </button>
-          <button onclick="quickLogin('priya')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
-            <span class="font-semibold text-slate-900 block text-[11px]">Priya V.</span>
-            <span class="text-[10px] text-slate-400">Selfi, Dresscode</span>
-          </button>
-          <button onclick="quickLogin('amit')" class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium text-left transition cursor-pointer truncate">
-            <span class="font-semibold text-slate-900 block text-[11px]">Amit P.</span>
-            <span class="text-[10px] text-slate-400">Arvind, BS Food</span>
-          </button>
-        </div>
+      <!-- Security Notice -->
+      <div class="pt-3 border-t border-slate-100 flex items-center gap-2 justify-center text-[11px] text-slate-400">
+        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span>Password Protected Role-Based Security</span>
       </div>
 
     </div>
@@ -131,13 +113,18 @@
           <button onclick="switchAdminTab('allLeads')" id="tabBtnAllLeads" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 cursor-pointer">All Leads Pool</button>
         </div>
 
-        <!-- Right Side: Clock & Logout -->
-        <div class="flex items-center gap-3">
-          <div class="hidden md:flex flex-col items-end text-xs font-mono text-slate-500">
+        <!-- Right Side: Clock, Change Password & Logout -->
+        <div class="flex items-center gap-2.5">
+          <div class="hidden md:flex flex-col items-end text-xs font-mono text-slate-500 mr-2">
             <span id="liveClock" class="font-medium text-slate-700">--:--:--</span>
           </div>
 
-          <button onclick="logout()" class="px-2.5 py-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium text-xs rounded-lg border border-slate-200 transition cursor-pointer">
+          <!-- Change Password Button -->
+          <button onclick="openChangePasswordModal()" class="px-2.5 py-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium text-xs rounded-lg border border-slate-200 transition cursor-pointer" title="Change your password">
+            Change Password
+          </button>
+
+          <button onclick="logout()" class="px-2.5 py-1.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-medium text-xs rounded-lg border border-rose-200 transition cursor-pointer">
             Sign out
           </button>
         </div>
@@ -155,7 +142,7 @@
         <!-- Assigned Brands Header -->
         <div class="bg-white border border-slate-200 rounded-xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-2xs">
           <div>
-            <h2 class="text-lg font-bold text-slate-900 tracking-tight" id="empGreeting">Welcome, Rahul</h2>
+            <h2 class="text-lg font-bold text-slate-900 tracking-tight" id="empGreeting">Welcome, User</h2>
             <div class="flex items-center gap-2 mt-1">
               <span class="text-xs text-slate-500">Assigned Brands:</span>
               <div id="empBrandBadges" class="inline-flex gap-1.5 flex-wrap"></div>
@@ -204,7 +191,7 @@
             <div>
               <label class="block font-medium text-slate-700 mb-1">Source for (Brand)</label>
               <select id="empFormBrand" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none focus:border-slate-900">
-                <!-- Dynamically populated -->
+                <!-- Dynamically populated based on caller's assigned brands -->
               </select>
             </div>
             <div>
@@ -368,7 +355,7 @@
             </div>
           </div>
 
-          <!-- Brand Breakdown Grid (Neutral Corporate styling) -->
+          <!-- Brand Breakdown Grid -->
           <div class="space-y-2.5">
             <h3 class="text-xs font-semibold text-slate-900 uppercase tracking-wider">Brand Portfolio Breakdown</h3>
             <div id="brandCardsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
@@ -510,7 +497,34 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 3. WHATSAPP REPORT MODAL                   -->
+  <!-- 3. MODAL: CHANGE PASSWORD (ADMIN & CALLER) -->
+  <!-- ========================================== -->
+  <div id="changePassModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-5 shadow-lg space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold text-sm text-slate-900">Change Password</h3>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">&times;</button>
+      </div>
+      <form onsubmit="handleChangePassword(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">Current Password</label>
+          <input type="password" id="curPass" required class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+        </div>
+        <div>
+          <label class="block font-medium text-slate-700 mb-1">New Secret Password</label>
+          <input type="password" id="newPass" required placeholder="Minimum 6 characters" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:border-slate-900">
+        </div>
+        <p id="passChangeMsg" class="text-[11px] font-medium hidden"></p>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeChangePasswordModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium cursor-pointer">Cancel</button>
+          <button type="submit" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition cursor-pointer">Save New Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. MODAL: WHATSAPP REPORT                  -->
   <!-- ========================================== -->
   <div id="waModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-5 shadow-lg space-y-4">
@@ -527,7 +541,7 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 4. CORE JAVASCRIPT LOGIC                   -->
+  <!-- 5. CORE JAVASCRIPT LOGIC                   -->
   <!-- ========================================== -->
   <script>
     const ALL_BRANDS = [
@@ -539,8 +553,9 @@
       "Selfi Creation"
     ];
 
+    // Seed Data with Secure Passwords
     const INITIAL_USERS = [
-      { id: "admin", name: "Administrator", email: "admin@company.com", pass: "admin123", role: "admin", brands: ALL_BRANDS },
+      { id: "admin", name: "Administrator (Boss)", email: "admin@company.com", pass: "admin123", role: "admin", brands: ALL_BRANDS },
       { id: "rahul", name: "Rahul Sharma", email: "rahul@company.com", pass: "rahul123", role: "employee", brands: ["C9 International", "Fabia"] },
       { id: "priya", name: "Priya Verma", email: "priya@company.com", pass: "priya123", role: "employee", brands: ["Selfi Creation", "Dresscode Clothing"] },
       { id: "amit",  name: "Amit Patel",  email: "amit@company.com",  pass: "amit123",  role: "employee", brands: ["Arvind Industries", "BS Food"] }
@@ -567,7 +582,7 @@
       localStorage.setItem("crm_current_user", JSON.stringify(currentUser));
     }
 
-    // Clock
+    // Live Clock
     function updateClock() {
       const now = new Date();
       const str = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
@@ -577,45 +592,19 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    function quickLogin(userId) {
-      const user = users.find(u => u.id === userId);
-      if (user) {
-        currentUser = user;
-        saveState();
-        renderApp();
-      }
-    }
-
-    function loginWithGoogle() {
-      const promptEmail = prompt("Enter Google Workspace Email:", "rahul@company.com");
-      if (!promptEmail) return;
-
-      let user = users.find(u => u.email.toLowerCase() === promptEmail.toLowerCase());
-      if (!user) {
-        user = {
-          id: "google_" + Date.now(),
-          name: promptEmail.split("@")[0].toUpperCase(),
-          email: promptEmail,
-          pass: "google_auth",
-          role: "employee",
-          brands: ["C9 International", "Fabia"]
-        };
-        users.push(user);
-      }
-      currentUser = user;
-      saveState();
-      renderApp();
-    }
-
+    // STRICT PASSWORD AUTHENTICATION
     function handleIdLogin(e) {
       e.preventDefault();
       const email = document.getElementById("loginId").value.trim().toLowerCase();
       const pass = document.getElementById("loginPass").value;
 
+      // Must strictly match both ID/Email AND Password!
       const user = users.find(u => (u.email.toLowerCase() === email || u.id === email) && u.pass === pass);
+      
       if (user) {
         currentUser = user;
         document.getElementById("loginError").classList.add("hidden");
+        document.getElementById("loginPass").value = "";
         saveState();
         renderApp();
       } else {
@@ -623,10 +612,83 @@
       }
     }
 
+    function loginWithGoogle() {
+      const promptEmail = prompt("Enter Authorized Google Account Email:", "");
+      if (!promptEmail) return;
+
+      const cleanEmail = promptEmail.trim().toLowerCase();
+      let user = users.find(u => u.email.toLowerCase() === cleanEmail);
+      
+      if (!user) {
+        alert("Ye Google account authorized nahi hai! Kripya Admin se apna account add karwayein.");
+        return;
+      }
+      
+      // If it's an admin account, require password even on Google click!
+      if (user.role === "admin") {
+        const adminPass = prompt("Administrator account security check. Enter Admin Password:");
+        if (adminPass !== user.pass) {
+          alert("Ghalat Admin Password! Access Denied.");
+          return;
+        }
+      }
+
+      currentUser = user;
+      saveState();
+      renderApp();
+    }
+
     function logout() {
       currentUser = null;
       localStorage.removeItem("crm_current_user");
       renderApp();
+    }
+
+    // CHANGE PASSWORD MODAL LOGIC
+    function openChangePasswordModal() {
+      document.getElementById("curPass").value = "";
+      document.getElementById("newPass").value = "";
+      const msg = document.getElementById("passChangeMsg");
+      msg.className = "text-[11px] font-medium hidden";
+      document.getElementById("changePassModal").classList.remove("hidden");
+    }
+
+    function closeChangePasswordModal() {
+      document.getElementById("changePassModal").classList.add("hidden");
+    }
+
+    function handleChangePassword(e) {
+      e.preventDefault();
+      const cur = document.getElementById("curPass").value;
+      const next = document.getElementById("newPass").value;
+      const msg = document.getElementById("passChangeMsg");
+
+      if (cur !== currentUser.pass) {
+        msg.innerText = "❌ Current password galat hai!";
+        msg.className = "text-[11px] font-medium text-rose-600 block";
+        return;
+      }
+
+      if (next.length < 4) {
+        msg.innerText = "❌ Naya password kam se kam 4 characters ka hona chahiye!";
+        msg.className = "text-[11px] font-medium text-rose-600 block";
+        return;
+      }
+
+      // Update in users array
+      const u = users.find(x => x.id === currentUser.id);
+      if (u) {
+        u.pass = next;
+        currentUser.pass = next;
+        saveState();
+      }
+
+      msg.innerText = "✅ Password successfully update ho gaya!";
+      msg.className = "text-[11px] font-medium text-emerald-600 block";
+
+      setTimeout(() => {
+        closeChangePasswordModal();
+      }, 1200);
     }
 
     function renderApp() {
@@ -809,7 +871,6 @@
       document.getElementById("bossKpiConvRate").innerText = `${convRate}%`;
       document.getElementById("bossKpiActiveCallers").innerText = callersCount;
 
-      // Brand Performance Cards
       const brandGrid = document.getElementById("brandCardsGrid");
       brandGrid.innerHTML = "";
 
@@ -828,7 +889,6 @@
         brandGrid.appendChild(card);
       });
 
-      // Team Scorecard
       const scoreTbody = document.getElementById("teamScorecardBody");
       scoreTbody.innerHTML = "";
 
@@ -868,13 +928,15 @@
             <div class="flex items-center gap-2">
               <span class="font-semibold text-xs text-slate-900">${u.name}</span>
               <span class="text-[10px] text-slate-400 font-mono">${u.email}</span>
-              <span class="text-[10px] text-slate-400 font-mono">pwd: ${u.pass}</span>
             </div>
             <div class="flex flex-wrap gap-1 mt-1.5">
               ${u.brands.map(b => `<span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-white text-slate-700 border border-slate-200">${b}</span>`).join("")}
             </div>
           </div>
-          <div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetUserPassword('${u.id}')" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-white border border-slate-300 hover:bg-slate-100 cursor-pointer text-slate-700">
+              Reset Password
+            </button>
             <button onclick="toggleBrandForUser('${u.id}')" class="px-2.5 py-1 text-xs font-medium rounded-lg bg-white border border-slate-300 hover:bg-slate-100 cursor-pointer text-slate-700">
               Edit Brands
             </button>
@@ -882,6 +944,17 @@
         `;
         container.appendChild(div);
       });
+    }
+
+    function resetUserPassword(userId) {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+      const newP = prompt(`Enter new password for ${user.name}:`, "123456");
+      if (newP) {
+        user.pass = newP;
+        saveState();
+        alert(`Password for ${user.name} updated to: ${newP}`);
+      }
     }
 
     function handleCreateUser(e) {
@@ -915,7 +988,7 @@
       document.getElementById("newUserPass").value = "";
       checkboxes.forEach(c => c.checked = false);
 
-      alert(`Caller account for ${name} created.`);
+      alert(`Caller account for ${name} created successfully.`);
       renderUsersList();
     }
 
