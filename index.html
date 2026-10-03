@@ -544,6 +544,7 @@
                   <option>Indiamart (BuyLead)</option>
                   <option>TradeIndia (Direct Enquiry)</option>
                   <option>TradeIndia (BuyLead)</option>
+                  <option>Meta Ads</option>
                   <option>Manual Database</option>
                 </select>
               </div>
@@ -734,6 +735,7 @@
               <button onclick="assignSelected()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium cursor-pointer">Assign</button>
               <span id="poolSelCount" class="text-slate-500">0 selected</span>
               <div class="ml-auto flex items-center gap-1.5"><span class="text-slate-500">Filter:</span>
+                <select id="poolSourceFilter" onchange="renderPoolTable()" class="px-2 py-1.5 border border-slate-300 rounded-lg outline-none"></select>
                 <select id="poolFilter" onchange="renderPoolTable()" class="px-2 py-1.5 border border-slate-300 rounded-lg outline-none"></select></div>
             </div>
             <div class="overflow-x-auto">
@@ -743,7 +745,7 @@
                     <th class="py-3 px-3"><input type="checkbox" id="poolSelectAll" onchange="toggleSelectAll(this.checked)" class="cursor-pointer"></th>
                     <th class="py-3 px-3">Date</th>
                     <th class="py-3 px-3">Brand</th>
-                    <th class="py-3 px-3">Type</th>
+                    <th class="py-3 px-3">Source / Type</th>
                     <th class="py-3 px-3">Client & Company</th>
                     <th class="py-3 px-3">Contact & Email</th>
                     <th class="py-3 px-3">Location</th>
@@ -1314,6 +1316,7 @@
       const fullLower = document.getElementById("smartPasteText").value.toLowerCase();
       if (fullLower.includes("indiamart")) document.getElementById("smartFormSource").value = "Indiamart";
       else if (fullLower.includes("tradeindia")) document.getElementById("smartFormSource").value = "TradeIndia";
+      else if (/facebook|instagram|meta\s*ads?|click to whatsapp/.test(fullLower)) document.getElementById("smartFormSource").value = "Meta Ads";
 
       // Auto detect lead type (BuyLead / Direct Enquiry)
       const ltRadio = (v) => document.querySelector(`input[name="empLeadType"][value="${v}"]`);
@@ -1847,7 +1850,7 @@ function doPost(e) {
             </select>
           </td>
           <td class="py-3 px-3 text-center whitespace-nowrap">${convBadge}</td>
-          <td class="py-3 px-3 whitespace-nowrap">${l.chat ? `<div class="text-[11px] text-slate-500 max-w-[160px] truncate">${escHtml(l.chat.slice(0, 40))}${l.chat.length > 40 ? '…' : ''}</div>` : ''}<button onclick="openChatModal('${l.id}')" class="mt-0.5 px-2 py-0.5 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded text-[11px] font-medium cursor-pointer">View Chat</button></td>
+          <td class="py-3 px-3 whitespace-nowrap">${l.chat ? `<div class="text-[11px] text-slate-500 max-w-[160px] truncate">${chatPreview(l.chat)}</div>` : ''}<button onclick="openChatModal('${l.id}')" class="mt-0.5 px-2 py-0.5 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded text-[11px] font-medium cursor-pointer">View Chat</button></td>
           <td class="py-3 px-3 text-center whitespace-nowrap space-x-1.5">
             <button onclick="sendCustomerWhatsApp('${l.id}')" class="text-xs px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-2xs inline-flex items-center gap-1 cursor-pointer transition">
               <span>💬</span> Send WA
@@ -2028,7 +2031,7 @@ function doPost(e) {
         const notesCol = pick(parts, "notes");
         const isBuyLead = o.sourceTag.toLowerCase().includes("buylead") || notesCol.toLowerCase().includes("buylead");
         const lead = {
-          id: "L_IMP_" + o.stamp + "_" + index, date: o.today, brand, source: o.sourceTag.split(" ")[0],
+          id: "L_IMP_" + o.stamp + "_" + index, date: o.today, brand, source: o.sourceTag.replace(/\s*\(.*\)\s*$/, ""),
           leadType: isBuyLead ? "BuyLead" : "Direct Enquiry", clientName: company, companyName: "-", company,
           phone, email: "-", city: loc || "-", location: loc, state: "", country: "India",
           req: pick(parts, "req") || (chat ? "WhatsApp chat lead" : "Customer Requirement"),
@@ -2107,6 +2110,8 @@ function doPost(e) {
         users, today: todayDate, stamp: Date.now()
       });
       stagedUploadLeads = res.staged;
+      const garbled = stagedUploadLeads.filter(l => /\?{3,}|\uFFFD/.test((l.chat || "") + (l.location || ""))).length;
+      if (garbled && !confirm("⚠️ " + garbled + " leads me Hindi/emoji text '???' ya '�' ban chuka hai. Ye file banate/save karte waqt hi kharab ho gaya hai (portal ki galti nahi).\n\nFile ko UTF-8 me dobara save karke upload karna behtar hai.\n\nPhir bhi import karein?")) { stagedUploadLeads = []; return; }
       const known = new Set(leads.map(l => normPhone(l.phone)).filter(k => k.length >= 10));
       const upd = stagedUploadLeads.filter(l => known.has(normPhone(l.phone))).length;
       window._previewInfo = stagedUploadLeads.length + " (" + (stagedUploadLeads.length - upd) + " new, " + upd + " update)" + (res.hasChat ? " • chat file" : "");
@@ -2253,9 +2258,18 @@ function doPost(e) {
 
     let selectedLeadIds = new Set();
 
+    function srcStyle(src) {
+      const x = String(src || "").toLowerCase();
+      if (x.includes("meta")) return "bg-blue-50 text-blue-700 border border-blue-200";
+      if (x.includes("indiamart")) return "bg-orange-50 text-orange-700 border border-orange-200";
+      if (x.includes("trade")) return "bg-purple-50 text-purple-700 border border-purple-200";
+      return "bg-slate-100 text-slate-700 border border-slate-200";
+    }
+
     function getPoolLeads() {
       const f = (document.getElementById("poolFilter") || {}).value || "all";
-      return leads.filter(l => f === "all" || (f === "unassigned" && !l.callerId) || (f === "assigned" && !!l.callerId) || (f.startsWith("emp:") && l.callerId === f.slice(4)));
+      const sf = (document.getElementById("poolSourceFilter") || {}).value || "";
+      return leads.filter(l => (!sf || l.source === sf) && (f === "all" || (f === "unassigned" && !l.callerId) || (f === "assigned" && !!l.callerId) || (f.startsWith("emp:") && l.callerId === f.slice(4))));
     }
 
     function refreshPoolControls() {
@@ -2267,6 +2281,13 @@ function doPost(e) {
       fSel.value = fv;
       eSel.innerHTML = '<option value="">Employee chuno</option>' + emps.map(u => `<option value="${u.id}">${escHtml(u.name)}</option>`).join("");
       eSel.value = ev;
+      const sSel = document.getElementById("poolSourceFilter");
+      if (sSel) {
+        const sv = sSel.value;
+        const srcs = [...new Set(["Indiamart", "TradeIndia", "Meta Ads", ...leads.map(l => l.source).filter(Boolean)])];
+        sSel.innerHTML = '<option value="">All Sources</option>' + srcs.map(x => `<option value="${escHtml(x)}">${escHtml(x)}</option>`).join("");
+        sSel.value = sv;
+      }
     }
 
     function updatePoolSelCount() { document.getElementById("poolSelCount").innerText = selectedLeadIds.size + " selected"; }
@@ -2286,12 +2307,12 @@ function doPost(e) {
         const loc = l.location || (l.state ? `${l.city || '-'}, ${l.state}` : (l.city || '-'));
         const estVal = Number(l.est) > 0 ? `₹${Number(l.est).toLocaleString('en-IN')}` : `<span class="text-slate-400 italic">Unquoted</span>`;
         const assigned = l.callerId ? escHtml((users.find(u => u.id === l.callerId) || { name: l.callerName || l.callerId }).name) : '<span class="text-amber-600 italic">Unassigned</span>';
-        const chatPrev = l.chat ? `<div class="text-[11px] text-slate-500 max-w-[200px] truncate">${escHtml(l.chat.slice(0, 40))}${l.chat.length > 40 ? '…' : ''}</div>` : '';
+        const chatPrev = l.chat ? `<div class="text-[11px] text-slate-500 max-w-[200px] truncate">${chatPreview(l.chat)}</div>` : '';
         return `<tr class="hover:bg-slate-50/70 transition">
           <td class="py-3 px-3"><input type="checkbox" class="cursor-pointer" ${selectedLeadIds.has(l.id) ? 'checked' : ''} onchange="toggleLeadSelect('${l.id}', this.checked)"></td>
           <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
           <td class="py-3 px-3 font-bold text-slate-900 whitespace-nowrap">${l.brand}</td>
-          <td class="py-3 px-3 text-slate-600 whitespace-nowrap"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${l.leadType === 'BuyLead' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">${l.leadType || 'Enquiry'}</span></td>
+          <td class="py-3 px-3 text-slate-600 whitespace-nowrap"><span class="px-2 py-0.5 rounded text-[10px] font-bold mr-1 ${srcStyle(l.source)}">${escHtml(l.source || '-')}</span><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${l.leadType === 'BuyLead' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">${l.leadType || 'Enquiry'}</span></td>
           <td class="py-3 px-3"><div class="font-bold text-slate-900 leading-tight">${escHtml(displayClient)}</div><div class="text-[11px] text-slate-400 font-medium">${displayCompany !== '-' ? '🏢 ' + escHtml(displayCompany) : 'Individual Buyer'}</div></td>
           <td class="py-3 px-3 whitespace-nowrap"><div class="font-mono font-bold text-slate-900 text-xs">${escHtml(l.phone)}</div><div class="text-[10px] text-slate-400 truncate max-w-[130px]">${l.email && l.email !== '-' ? '✉️ ' + escHtml(l.email) : ''}</div></td>
           <td class="py-3 px-3 text-slate-600 whitespace-nowrap"><div class="font-medium text-slate-800">${escHtml(loc)}</div><div class="text-[10px] text-slate-400">${l.totalMessages ? escHtml(l.totalMessages) + ' msgs' : ''}</div></td>
@@ -2332,11 +2353,25 @@ function doPost(e) {
     }
 
     function parseChatMsg(raw) {
-      let m = String(raw).trim(), ts = "";
-      const r = m.match(/^\[?\s*(\d{1,4}[\/.\-]\d{1,2}[\/.\-]\d{1,4}),?\s*(\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]\.?\s?m\.?)?)\s*\]?\s*[-–:]?\s*/i);
-      if (r) { ts = r[1] + ", " + r[2].trim(); m = m.slice(r[0].length); }
-      const mine = /^you\s*:/i.test(m);
-      return { ts, mine, text: m.replace(/^you\s*:\s*/i, "") };
+      let m = String(raw).trim(), ts = "", stamped = false;
+      let r = m.match(/^\[([^\]]{4,40})\]\s*/);                       // [27-Sep-2026 08:17 PM] ...
+      if (r) { ts = r[1].trim(); m = m.slice(r[0].length); stamped = true; }
+      else {
+        r = m.match(/^(\d{1,4}[\/.\-]\d{1,2}[\/.\-]\d{1,4}),?\s*(\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]\.?\s?m\.?)?)\s*[-–]\s*/i);   // 12/05/2026, 10:31 am - ...
+        if (r) { ts = r[1] + ", " + r[2].trim(); m = m.slice(r[0].length); stamped = true; }
+      }
+      const you = m.match(/^you\s*:\s*/i);
+      if (you) return { ts, mine: true, text: m.slice(you[0].length) };
+      if (stamped) { const sd = m.match(/^([^:]{1,40}):\s+/); if (sd) m = m.slice(sd[0].length); }   // customer ka "+91 98...:" label hatao
+      return { ts, mine: false, text: m };
+    }
+
+    function chatPreview(chat) {
+      const msgs = String(chat || "").split(" | ").filter(x => x.trim());
+      if (!msgs.length) return "";
+      const c = parseChatMsg(msgs[msgs.length - 1]);
+      const t = (c.mine ? "You: " : "") + c.text;
+      return escHtml(t.slice(0, 40)) + (t.length > 40 ? "…" : "");
     }
 
     function openChatModal(id) {
