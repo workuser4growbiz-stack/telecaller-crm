@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enterprise Sales CRM — Multi-Brand Lead Management</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -495,17 +496,21 @@
               </button>
             </div>
 
+            <div class="flex justify-end">
+              <button onclick="undoLastBulkImport()" class="px-3 py-1.5 border border-rose-300 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-medium cursor-pointer">↩ Undo Last Bulk Import</button>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
               <div class="space-y-3 p-4 bg-slate-50/70 border border-slate-200 rounded-xl">
                 <div class="flex items-center gap-2">
                   <span class="w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center">1</span>
-                  <h4 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Upload CSV File</h4>
+                  <h4 class="font-semibold text-xs text-slate-900 uppercase tracking-wider">Upload Excel / CSV File</h4>
                 </div>
                 <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center bg-white hover:bg-slate-50/50 transition">
-                  <input type="file" id="csvFileInput" accept=".csv,.txt" onchange="handleCSVFileSelect(event)" class="hidden">
+                  <input type="file" id="csvFileInput" accept=".csv,.txt,.xlsx,.xls" onchange="handleCSVFileSelect(event)" class="hidden">
                   <label for="csvFileInput" class="cursor-pointer block space-y-2">
                     <svg class="w-8 h-8 text-slate-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                    <span class="text-xs font-medium text-slate-700 block">Click to select CSV file</span>
+                    <span class="text-xs font-medium text-slate-700 block">Click to select Excel (.xlsx) ya CSV file</span>
                     <span class="text-[11px] text-slate-400 block" id="selectedFileName">No file selected yet</span>
                   </label>
                 </div>
@@ -863,14 +868,11 @@
       "Selfi Creation": "Namaste {name} ji, Selfi Creation designer kurtis se sampark kar rahe hain. Aapki {source} requirement mili thi. Latest festive & casual kurti catalog dekhne ke liye batayein."
     };
 
-       const INITIAL_USERS = [
-      {"id":"admin","name":"Administrator","email":"admin@company.com","pass":"Boss@850","role":"admin","brands":["C9 International","Arvind Industries","BS Food","Dresscode Clothing","Fabia","Selfi Creation"]},
-      {"id":"rahul","name":"Rahul Sharma","email":"rahul@company.com","pass":"rahul123","role":"employee","brands":["C9 International","Fabia"]},
-      {"id":"priya","name":"Priya Verma","email":"priya@company.com","pass":"priya123","role":"employee","brands":["Selfi Creation","Dresscode Clothing"]},
-      {"id":"amit","name":"Amit Patel","email":"amit@company.com","pass":"amit123","role":"employee","brands":["Arvind Industries","BS Food"]},
-      {"id":"emp_1790753108046","name":"demo new","email":"demo@123","pass":"aass1122","role":"employee","brands":["Arvind Industries"]},
-      {"id":"emp_1790761921659","name":"KARTIK MEHRA","email":"workuser4.growbiz@gmail.com","pass":"323021","role":"employee","brands":["Selfi Creation"]},
-      {"id":"emp_1790769865531","name":"Manider sir","email":"growbiz.manindersingh@gmail.com","pass":"aass1122","role":"employee","brands":["Selfi Creation"]}
+    const INITIAL_USERS = [
+      { id: "admin", name: "Administrator (Boss)", email: "admin@company.com", pass: "admin123", role: "admin", brands: ALL_BRANDS },
+      { id: "rahul", name: "Rahul Sharma", email: "rahul@company.com", pass: "rahul123", role: "employee", brands: ["C9 International", "Fabia"] },
+      { id: "priya", name: "Priya Verma", email: "priya@company.com", pass: "priya123", role: "employee", brands: ["Selfi Creation", "Dresscode Clothing"] },
+      { id: "amit",  name: "Amit Patel",  email: "amit@company.com",  pass: "amit123",  role: "employee", brands: ["Arvind Industries", "BS Food"] }
     ];
 
     const todayDate = new Date().toISOString().slice(0, 10);
@@ -886,10 +888,11 @@
 
     let users = JSON.parse(localStorage.getItem("crm_users")) || [];
     // Code me likhe INITIAL_USERS har device par add ho jayenge (taaki employee kisi bhi device se login kar sake)
-    INITIAL_USERS.forEach(u => { if (!users.find(x => x.id === u.id)) users.push(u); });
+    INITIAL_USERS.forEach(u => { const i = users.findIndex(x => x.id === u.id); if (i >= 0) users[i] = u; else users.push(u); });
     let leads = JSON.parse(localStorage.getItem("crm_leads")) || INITIAL_LEADS;
     let templates = JSON.parse(localStorage.getItem("crm_templates")) || DEFAULT_TEMPLATES;
     let currentUser = JSON.parse(localStorage.getItem("crm_current_user")) || null;
+    if (currentUser) currentUser = users.find(u => u.id === currentUser.id) || null;
     let stagedUploadLeads = [];
 
     function saveState() {
@@ -1938,12 +1941,34 @@ function doPost(e) {
       const file = e.target.files[0];
       if (!file) return;
       document.getElementById("selectedFileName").innerText = file.name;
-
       const reader = new FileReader();
-      reader.onload = function(evt) {
-        document.getElementById("pasteExcelInput").value = evt.target.result;
-      };
-      reader.readAsText(file);
+      if (/\.(xlsx|xls)$/i.test(file.name)) {
+        if (typeof XLSX === "undefined") { alert("Excel reader load nahi hua. Internet check karo ya file ko CSV me save karke upload karo."); return; }
+        reader.onload = function(evt) {
+          try {
+            const wb = XLSX.read(evt.target.result, { type: "array" });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            document.getElementById("pasteExcelInput").value = XLSX.utils.sheet_to_csv(ws, { FS: "\t", blankrows: false });
+          } catch (err) { alert("Excel file padh nahi paaye: " + err.message); }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        reader.onload = function(evt) { document.getElementById("pasteExcelInput").value = evt.target.result; };
+        reader.readAsText(file);
+      }
+    }
+
+    function undoLastBulkImport() {
+      const stamps = leads.filter(l => /^L_IMP_\d+_/.test(l.id)).map(l => l.id.split("_")[2]);
+      if (!stamps.length) { alert("Koi bulk import mili nahi."); return; }
+      const last = stamps.sort().pop();
+      const prefix = "L_IMP_" + last + "_";
+      const count = leads.filter(l => l.id.startsWith(prefix)).length;
+      if (!confirm("Last bulk import ki " + count + " leads delete karni hain?\n\n(Google Sheet se rows alag se hatani padengi.)")) return;
+      leads = leads.filter(l => !l.id.startsWith(prefix));
+      saveState();
+      alert("✅ " + count + " leads delete ho gayi.");
+      renderAdminDashboard();
     }
 
     function downloadUploadSampleCSV() {
@@ -1968,26 +1993,46 @@ function doPost(e) {
         return;
       }
 
+      if (/^PK|\u0000|\uFFFD/.test(rawText.slice(0, 300))) {
+        alert("Ye file sahi format me nahi padhi ja saki. Excel (.xlsx) ya CSV file hi upload karein.");
+        return;
+      }
+
       const assignOption = document.getElementById("uploadAssignCaller").value;
       const sourceTag = document.getElementById("uploadLeadSource").value;
 
       const lines = rawText.split(/\r?\n/).filter(line => line.trim().length > 0);
       stagedUploadLeads = [];
 
+      // Header ho to columns ko naam se pehchano, warna default order: Company, Phone, City, Brand, Requirement, Est, Notes
+      let colMap = { company: 0, phone: 1, city: 2, brand: 3, req: 4, est: 5, notes: 6 };
+      const looksHeader = /contact|phone|mobile|company|name/.test(lines[0].toLowerCase());
+      if (looksHeader) {
+        const hdr = (lines[0].includes("\t") ? lines[0].split("\t") : lines[0].split(",")).map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        const find = (re) => hdr.findIndex(h => re.test(h));
+        colMap = {
+          company: find(/company|firm|client|customer|name/), phone: find(/phone|mobile|contact|number|whatsapp/),
+          city: find(/city|location/), brand: find(/brand/), req: find(/requirement|product|enquiry|message|item/),
+          est: find(/est|value|amount|budget/), notes: find(/note|type/)
+        };
+      }
+      const pick = (parts, k) => (colMap[k] >= 0 ? parts[colMap[k]] : undefined);
+
       lines.forEach((line, index) => {
-        if (index === 0 && (line.toLowerCase().includes("contact") || line.toLowerCase().includes("phone") || line.toLowerCase().includes("company"))) {
+        if (index === 0 && looksHeader) {
           return;
         }
 
         let parts = line.includes("\t") ? line.split("\t") : line.split(",");
         parts = parts.map(p => p.replace(/^["']|["']$/g, '').trim());
 
-        const company = parts[0] || "Customer " + (index + 1);
-        const phone = parts[1] || "-";
-        const city = parts[2] || "-";
-        let brand = parts[3] || "Fabia";
-        const req = parts[4] || "Customer Requirement";
-        const est = Number(parts[5] || 0);
+        const company = pick(parts, "company") || "Customer " + (index + 1);
+        const phone = pick(parts, "phone") || "-";
+        const city = pick(parts, "city") || "-";
+        let brand = pick(parts, "brand") || "Fabia";
+        const req = pick(parts, "req") || "Customer Requirement";
+        const est = Number(String(pick(parts, "est") || 0).replace(/[^0-9.]/g, "")) || 0;
+        const notesCol = pick(parts, "notes");
 
         const matchedBrand = ALL_BRANDS.find(b => b.toLowerCase() === brand.toLowerCase()) || ALL_BRANDS[0];
 
@@ -2004,7 +2049,7 @@ function doPost(e) {
           callerName = eligibleEmp ? eligibleEmp.name : "Auto-Routed";
         }
 
-        const isBuyLead = sourceTag.toLowerCase().includes("buylead") || (parts[6] && parts[6].toLowerCase().includes("buylead"));
+        const isBuyLead = sourceTag.toLowerCase().includes("buylead") || (notesCol && notesCol.toLowerCase().includes("buylead"));
 
         stagedUploadLeads.push({
           id: "L_IMP_" + Date.now() + "_" + index,
