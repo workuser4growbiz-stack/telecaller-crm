@@ -377,6 +377,7 @@
                   <th class="py-3 px-3 text-right">Est. Deal (₹)</th>
                   <th class="py-3 px-3">Call Disposition</th>
                   <th class="py-3 px-3 text-center">Won?</th>
+                  <th class="py-3 px-3">Chat</th>
                   <th class="py-3 px-3 text-center">Actions</th>
                 </tr>
               </thead>
@@ -531,6 +532,10 @@
                 <select id="uploadAssignCaller" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-900 outline-none">
                   <option value="auto">⚡ Auto-Route by Brand</option>
                 </select>
+              </div>
+              <div>
+                <label class="block font-medium text-slate-700 mb-1 text-xs">Default Brand (file me Brand column na ho to):</label>
+                <select id="uploadDefaultBrand" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 outline-none"></select>
               </div>
               <div>
                 <label class="block text-xs font-medium text-slate-700 mb-1">Lead Type & Source:</label>
@@ -722,18 +727,29 @@
               </div>
               <span id="bossLeadCount" class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-700 font-medium">0 Leads</span>
             </div>
+            <div class="p-3 border-b border-slate-200 bg-white flex flex-wrap items-center gap-2 text-xs">
+              <input type="number" id="assignQty" min="1" placeholder="QTY" class="w-20 px-2 py-1.5 border border-slate-300 rounded-lg outline-none">
+              <button onclick="selectTopQty()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium cursor-pointer">Select Top QTY</button>
+              <select id="assignEmpSelect" class="px-2 py-1.5 border border-slate-300 rounded-lg outline-none"></select>
+              <button onclick="assignSelected()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium cursor-pointer">Assign</button>
+              <span id="poolSelCount" class="text-slate-500">0 selected</span>
+              <div class="ml-auto flex items-center gap-1.5"><span class="text-slate-500">Filter:</span>
+                <select id="poolFilter" onchange="renderPoolTable()" class="px-2 py-1.5 border border-slate-300 rounded-lg outline-none"></select></div>
+            </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                    <th class="py-3 px-3"><input type="checkbox" id="poolSelectAll" onchange="toggleSelectAll(this.checked)" class="cursor-pointer"></th>
                     <th class="py-3 px-3">Date</th>
                     <th class="py-3 px-3">Brand</th>
                     <th class="py-3 px-3">Type</th>
                     <th class="py-3 px-3">Client & Company</th>
                     <th class="py-3 px-3">Contact & Email</th>
                     <th class="py-3 px-3">Location</th>
+                    <th class="py-3 px-3">Chat</th>
                     <th class="py-3 px-3">Requirement</th>
-                    <th class="py-3 px-3">Assigned Caller</th>
+                    <th class="py-3 px-3">Assigned To</th>
                     <th class="py-3 px-3 text-right">Est. Deal (₹)</th>
                     <th class="py-3 px-3">Call Disposition</th>
                     <th class="py-3 px-3 text-center">Won?</th>
@@ -849,6 +865,16 @@
   <!-- ========================================== -->
   <!-- 6. CORE JAVASCRIPT LOGIC                   -->
   <!-- ========================================== -->
+  <div id="chatModal" class="fixed inset-0 bg-slate-900/40 z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg flex flex-col" style="max-height:85vh">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-start gap-3">
+        <div><h3 id="chatModalTitle" class="font-bold text-sm text-slate-900"></h3><p id="chatModalSub" class="text-[11px] text-slate-500"></p></div>
+        <button onclick="closeChatModal()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-xs font-medium cursor-pointer">Close</button>
+      </div>
+      <div id="chatModalBody" class="p-4 space-y-2" style="overflow-y:auto;flex:1;min-height:0;background:#efeae2"></div>
+    </div>
+  </div>
+
   <script>
     const ALL_BRANDS = [
       "C9 International",
@@ -1377,12 +1403,14 @@
     }
     function buildSheetPayload(lead) {
       const callerObj = users.find(u => u.id === lead.callerId);
-      return Object.assign({}, lead, {
+      const out = Object.assign({}, lead, {
         callerName: callerObj ? callerObj.name : lead.callerId,
         // Sheet ke Lead Type column me "Source - Type" dikhao (e.g. Indiamart - Direct Enquiry)
         leadType: (lead.source ? lead.source + " - " : "") + (lead.leadType || "Enquiry"),
         sheetId: getEmpSheets()[lead.callerId] || ""
       });
+      delete out.chat;
+      return out;
     }
 
     // Push ONE lead: master sheet + us employee ki apni sheet
@@ -1744,7 +1772,7 @@ function doPost(e) {
       const selectEl = document.getElementById("smartFormBrand");
       selectEl.innerHTML = currentUser.brands.map(b => `<option value="${b}">${b}</option>`).join("");
 
-      const myLeads = leads.filter(l => l.callerId === currentUser.id || currentUser.brands.includes(l.brand));
+      const myLeads = leads.filter(l => l.callerId === currentUser.id);
 
       const totalCalls = myLeads.length;
       const buyLeadsCount = myLeads.filter(l => l.leadType === "BuyLead").length;
@@ -1761,7 +1789,7 @@ function doPost(e) {
       tbody.innerHTML = "";
 
       if (myLeads.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400 font-medium">Aapke assigned brands ke liye abhi koi leads nahi hain. Upar Smart Extractor se lead add karein!</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-400 font-medium">Abhi aapko koi lead assign nahi hui hai. Admin se leads assign karwayein ya upar Smart Extractor se lead add karein!</td></tr>`;
         return;
       }
 
@@ -1786,9 +1814,7 @@ function doPost(e) {
           ? `<span onclick="editLeadEst('${l.id}')" class="font-bold text-slate-900 cursor-pointer hover:text-indigo-600" title="Click to edit deal amount">₹${Number(l.est).toLocaleString('en-IN')}</span>`
           : `<button onclick="editLeadEst('${l.id}')" class="text-slate-400 hover:text-indigo-600 italic text-[11px] underline cursor-pointer">+ Quote Rate</button>`;
 
-        const locationDisplay = l.state 
-          ? `${l.city || '-'}, ${l.state}` 
-          : (l.city || '-');
+        const locationDisplay = l.location || (l.state ? `${l.city || '-'}, ${l.state}` : (l.city || '-'));
 
         tr.innerHTML = `
           <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
@@ -1821,6 +1847,7 @@ function doPost(e) {
             </select>
           </td>
           <td class="py-3 px-3 text-center whitespace-nowrap">${convBadge}</td>
+          <td class="py-3 px-3 whitespace-nowrap">${l.chat ? `<div class="text-[11px] text-slate-500 max-w-[160px] truncate">${escHtml(l.chat.slice(0, 40))}${l.chat.length > 40 ? '…' : ''}</div>` : ''}<button onclick="openChatModal('${l.id}')" class="mt-0.5 px-2 py-0.5 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded text-[11px] font-medium cursor-pointer">View Chat</button></td>
           <td class="py-3 px-3 text-center whitespace-nowrap space-x-1.5">
             <button onclick="sendCustomerWhatsApp('${l.id}')" class="text-xs px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-2xs inline-flex items-center gap-1 cursor-pointer transition">
               <span>💬</span> Send WA
@@ -1931,32 +1958,109 @@ function doPost(e) {
 
     function initUploadTab() {
       const selectCaller = document.getElementById("uploadAssignCaller");
-      selectCaller.innerHTML = `<option value="auto">⚡ Auto-Route by Brand</option>`;
+      selectCaller.innerHTML = `<option value="auto">⚡ Auto-Route by Brand (chat file = Unassigned)</option><option value="none">📭 Unassigned (baad me QTY se assign karunga)</option>`;
+      document.getElementById("uploadDefaultBrand").innerHTML = ALL_BRANDS.map(b => `<option value="${b}">${b}</option>`).join("");
+      document.getElementById("pasteExcelInput").oninput = () => { uploadRowsFromFile = null; };
       users.filter(u => u.role === "employee").forEach(emp => {
         selectCaller.innerHTML += `<option value="${emp.id}">Assign all to: ${emp.name} (${emp.brands.join(', ')})</option>`;
       });
     }
 
-    function handleCSVFileSelect(e) {
+    let uploadRowsFromFile = null;
+
+    async function handleCSVFileSelect(e) {
       const file = e.target.files[0];
       if (!file) return;
       document.getElementById("selectedFileName").innerText = file.name;
-      const reader = new FileReader();
-      if (/\.(xlsx|xls)$/i.test(file.name)) {
-        if (typeof XLSX === "undefined") { alert("Excel reader load nahi hua. Internet check karo ya file ko CSV me save karke upload karo."); return; }
-        reader.onload = function(evt) {
-          try {
-            const wb = XLSX.read(evt.target.result, { type: "array" });
-            const ws = wb.Sheets[wb.SheetNames[0]];
-            document.getElementById("pasteExcelInput").value = XLSX.utils.sheet_to_csv(ws, { FS: "\t", blankrows: false });
-          } catch (err) { alert("Excel file padh nahi paaye: " + err.message); }
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        reader.onload = function(evt) { document.getElementById("pasteExcelInput").value = evt.target.result; };
-        reader.readAsText(file);
-      }
+      if (typeof XLSX === "undefined") { alert("File reader load nahi hua. Internet check karo."); return; }
+      try {
+        let wb;
+        if (/\.(xlsx|xls)$/i.test(file.name)) wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+        else wb = XLSX.read(await file.text(), { type: "string", raw: true }); // file.text() = UTF-8
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" })
+          .map(r => r.map(c => String(c == null ? "" : c).trim()))
+          .filter(r => r.some(c => c !== ""));
+        uploadRowsFromFile = rows;
+        document.getElementById("pasteExcelInput").value = "✔ File padh li gayi: " + rows.length + " rows (header sameet). Ab neeche 'Process' dabayein.";
+      } catch (err) { alert("File padh nahi paaye: " + err.message); }
     }
+
+    // ==IMPORT_CORE_START==
+    function normPhone(p) { const d = String(p || "").replace(/\D/g, ""); return d.length >= 10 ? d.slice(-10) : d; }
+    function escHtml(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+    // rows = array of arrays (header optional). 1 row = 1 lead.
+    function buildLeadsFromRows(rows, o) {
+      let colMap = { company: 0, phone: 1, city: 2, brand: 3, req: 4, est: 5, notes: 6, totalMessages: -1, chat: -1 };
+      const head = rows[0].map(h => String(h).toLowerCase());
+      const looksHeader = head.some(h => /contact|phone|mobile|company|name|chat|location/.test(h));
+      if (looksHeader) {
+        const used = new Set();
+        const find = re => { const i = head.findIndex((h, k) => !used.has(k) && re.test(h)); if (i >= 0) used.add(i); return i; };
+        colMap = { chat: find(/chat/), totalMessages: find(/total|msg/), phone: find(/phone|mobile|contact|number|whatsapp/),
+          city: find(/city|location/), brand: find(/brand/), est: find(/\best\b|value|amount|budget/), notes: find(/note|type/),
+          company: find(/company|firm|client|customer|name/), req: find(/requirement|product|enquiry|message|item/) };
+      }
+      const hasChat = colMap.chat >= 0;
+      const pick = (parts, k) => (colMap[k] >= 0 ? String(parts[colMap[k]] == null ? "" : parts[colMap[k]]).trim() : "");
+      const data = looksHeader ? rows.slice(1) : rows;
+      const byPhone = new Map(); const out = [];
+
+      data.forEach((parts, index) => {
+        const phone = pick(parts, "phone") || "-";
+        const loc = pick(parts, "city");
+        const chat = pick(parts, "chat");
+        const company = pick(parts, "company") || (phone !== "-" ? phone : "Customer " + (index + 1));
+        const brandRaw = pick(parts, "brand") || o.defaultBrand;
+        const brand = ALL_BRANDS.find(b => b.toLowerCase() === brandRaw.toLowerCase()) || o.defaultBrand;
+
+        let callerId = "", callerName = "Unassigned";
+        if (o.assignOption === "none" || (o.assignOption === "auto" && hasChat)) { /* unassigned */ }
+        else if (o.assignOption !== "auto") {
+          callerId = o.assignOption;
+          const emp = o.users.find(u => u.id === callerId);
+          callerName = emp ? emp.name : "Assigned";
+        } else {
+          const emp = o.users.find(u => u.role === "employee" && u.brands.includes(brand)) || o.users[1];
+          callerId = emp ? emp.id : "rahul"; callerName = emp ? emp.name : "Auto-Routed";
+        }
+        const notesCol = pick(parts, "notes");
+        const isBuyLead = o.sourceTag.toLowerCase().includes("buylead") || notesCol.toLowerCase().includes("buylead");
+        const lead = {
+          id: "L_IMP_" + o.stamp + "_" + index, date: o.today, brand, source: o.sourceTag.split(" ")[0],
+          leadType: isBuyLead ? "BuyLead" : "Direct Enquiry", clientName: company, companyName: "-", company,
+          phone, email: "-", city: loc || "-", location: loc, state: "", country: "India",
+          req: pick(parts, "req") || (chat ? "WhatsApp chat lead" : "Customer Requirement"),
+          totalMessages: pick(parts, "totalMessages"), chat, qty: 1,
+          est: Number(String(pick(parts, "est") || 0).replace(/[^0-9.]/g, "")) || 0,
+          status: "New (Not Called)", followup: "-", converted: "Pending",
+          callerId, callerName, assignedTo: callerId, notes: "Manual Customer Upload"
+        };
+        const key = normPhone(phone);
+        if (key.length >= 10 && byPhone.has(key)) { Object.assign(byPhone.get(key), { ...lead, id: byPhone.get(key).id }); }
+        else { out.push(lead); if (key.length >= 10) byPhone.set(key, lead); }
+      });
+      return { staged: out, hasChat };
+    }
+
+    // Duplicate phone => update, warna naya. Returns counts.
+    function mergeStagedIntoLeads(staged, store) {
+      const map = new Map(); store.forEach(l => { const k = normPhone(l.phone); if (k.length >= 10 && !map.has(k)) map.set(k, l); });
+      const fresh = [], touched = []; let updated = 0;
+      staged.forEach(sl => {
+        const k = normPhone(sl.phone); const ex = k.length >= 10 ? map.get(k) : null;
+        if (ex) {
+          ["location", "totalMessages", "chat"].forEach(f => { if (sl[f]) ex[f] = sl[f]; });
+          if (sl.city && sl.city !== "-") ex.city = sl.city;
+          if (sl.callerId) { ex.callerId = sl.callerId; ex.callerName = sl.callerName; ex.assignedTo = sl.callerId; }
+          updated++; touched.push(ex);
+        } else { fresh.push(sl); touched.push(sl); if (k.length >= 10) map.set(k, sl); }
+      });
+      store.unshift(...fresh);
+      return { added: fresh.length, updated, touched };
+    }
+    // ==IMPORT_CORE_END==
 
     function undoLastBulkImport() {
       const stamps = leads.filter(l => /^L_IMP_\d+_/.test(l.id)).map(l => l.id.split("_")[2]);
@@ -1987,99 +2091,29 @@ function doPost(e) {
     }
 
     function processUploadData() {
-      const rawText = document.getElementById("pasteExcelInput").value.trim();
-      if (!rawText) {
-        alert("Pehle CSV file select karein ya text paste karein!");
-        return;
+      let rows = uploadRowsFromFile;
+      if (!rows) {
+        const rawText = document.getElementById("pasteExcelInput").value.trim();
+        if (!rawText) { alert("Pehle Excel/CSV file select karein ya text paste karein!"); return; }
+        if (/^PK|\u0000|\uFFFD/.test(rawText.slice(0, 300))) { alert("Ye file sahi format me nahi padhi ja saki. Excel (.xlsx) ya CSV file hi upload karein."); return; }
+        rows = rawText.split(/\r?\n/).filter(l => l.trim()).map(line => (line.includes("\t") ? line.split("\t") : line.split(",")).map(p => p.replace(/^["']|["']$/g, "").trim()));
       }
+      if (!rows.length) { alert("File khaali hai!"); return; }
 
-      if (/^PK|\u0000|\uFFFD/.test(rawText.slice(0, 300))) {
-        alert("Ye file sahi format me nahi padhi ja saki. Excel (.xlsx) ya CSV file hi upload karein.");
-        return;
-      }
-
-      const assignOption = document.getElementById("uploadAssignCaller").value;
-      const sourceTag = document.getElementById("uploadLeadSource").value;
-
-      const lines = rawText.split(/\r?\n/).filter(line => line.trim().length > 0);
-      stagedUploadLeads = [];
-
-      // Header ho to columns ko naam se pehchano, warna default order: Company, Phone, City, Brand, Requirement, Est, Notes
-      let colMap = { company: 0, phone: 1, city: 2, brand: 3, req: 4, est: 5, notes: 6 };
-      const looksHeader = /contact|phone|mobile|company|name/.test(lines[0].toLowerCase());
-      if (looksHeader) {
-        const hdr = (lines[0].includes("\t") ? lines[0].split("\t") : lines[0].split(",")).map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
-        const find = (re) => hdr.findIndex(h => re.test(h));
-        colMap = {
-          company: find(/company|firm|client|customer|name/), phone: find(/phone|mobile|contact|number|whatsapp/),
-          city: find(/city|location/), brand: find(/brand/), req: find(/requirement|product|enquiry|message|item/),
-          est: find(/est|value|amount|budget/), notes: find(/note|type/)
-        };
-      }
-      const pick = (parts, k) => (colMap[k] >= 0 ? parts[colMap[k]] : undefined);
-
-      lines.forEach((line, index) => {
-        if (index === 0 && looksHeader) {
-          return;
-        }
-
-        let parts = line.includes("\t") ? line.split("\t") : line.split(",");
-        parts = parts.map(p => p.replace(/^["']|["']$/g, '').trim());
-
-        const company = pick(parts, "company") || "Customer " + (index + 1);
-        const phone = pick(parts, "phone") || "-";
-        const city = pick(parts, "city") || "-";
-        let brand = pick(parts, "brand") || "Fabia";
-        const req = pick(parts, "req") || "Customer Requirement";
-        const est = Number(String(pick(parts, "est") || 0).replace(/[^0-9.]/g, "")) || 0;
-        const notesCol = pick(parts, "notes");
-
-        const matchedBrand = ALL_BRANDS.find(b => b.toLowerCase() === brand.toLowerCase()) || ALL_BRANDS[0];
-
-        let callerId = "";
-        let callerName = "";
-
-        if (assignOption !== "auto") {
-          callerId = assignOption;
-          const assignedEmp = users.find(u => u.id === callerId);
-          callerName = assignedEmp ? assignedEmp.name : "Assigned";
-        } else {
-          const eligibleEmp = users.find(u => u.role === "employee" && u.brands.includes(matchedBrand)) || users[1];
-          callerId = eligibleEmp ? eligibleEmp.id : "rahul";
-          callerName = eligibleEmp ? eligibleEmp.name : "Auto-Routed";
-        }
-
-        const isBuyLead = sourceTag.toLowerCase().includes("buylead") || (notesCol && notesCol.toLowerCase().includes("buylead"));
-
-        stagedUploadLeads.push({
-          id: "L_IMP_" + Date.now() + "_" + index,
-          date: todayDate,
-          brand: matchedBrand,
-          source: sourceTag.split(" ")[0],
-          leadType: isBuyLead ? "BuyLead" : "Direct Enquiry",
-          clientName: company,
-          companyName: "-",
-          company: company,
-          phone: phone,
-          email: "-",
-          city: city,
-          state: "",
-          country: "India",
-          req: req,
-          qty: 1,
-          est: est,
-          status: "New (Not Called)",
-          followup: "-",
-          converted: "Pending",
-          callerId: callerId,
-          callerName: callerName,
-          notes: "Manual Customer Upload"
-        });
+      const res = buildLeadsFromRows(rows, {
+        assignOption: document.getElementById("uploadAssignCaller").value,
+        sourceTag: document.getElementById("uploadLeadSource").value,
+        defaultBrand: document.getElementById("uploadDefaultBrand").value || ALL_BRANDS[0],
+        users, today: todayDate, stamp: Date.now()
       });
+      stagedUploadLeads = res.staged;
+      const known = new Set(leads.map(l => normPhone(l.phone)).filter(k => k.length >= 10));
+      const upd = stagedUploadLeads.filter(l => known.has(normPhone(l.phone))).length;
+      window._previewInfo = stagedUploadLeads.length + " (" + (stagedUploadLeads.length - upd) + " new, " + upd + " update)" + (res.hasChat ? " • chat file" : "");
 
       const tbody = document.getElementById("uploadPreviewTbody");
       tbody.innerHTML = "";
-      document.getElementById("previewCountBadge").innerText = stagedUploadLeads.length;
+      document.getElementById("previewCountBadge").innerText = window._previewInfo || stagedUploadLeads.length;
 
       stagedUploadLeads.forEach(l => {
         const tr = document.createElement("tr");
@@ -2100,6 +2134,7 @@ function doPost(e) {
 
     function cancelUploadPreview() {
       stagedUploadLeads = [];
+      uploadRowsFromFile = null;
       document.getElementById("uploadPreviewSection").classList.add("hidden");
       document.getElementById("pasteExcelInput").value = "";
       document.getElementById("selectedFileName").innerText = "No file selected yet";
@@ -2107,13 +2142,13 @@ function doPost(e) {
 
     function commitBulkImport() {
       if (stagedUploadLeads.length === 0) return;
-      const toPush = stagedUploadLeads.slice();
-      leads.unshift(...stagedUploadLeads);
+      const r = mergeStagedIntoLeads(stagedUploadLeads, leads);
       saveState();
-      (async () => { for (const l of toPush) { await pushLeadToSheets(l); } })();
-      alert(`✅ ${stagedUploadLeads.length} Leads successfully import ho gayi hain!`);
+      (async () => { for (const l of r.touched) { await pushLeadToSheets(l); } })();
+      alert(`✅ ${r.added} new, ${r.updated} updated`);
       cancelUploadPreview();
       switchAdminTab("allLeads");
+      renderPoolTable();
     }
 
     function renderUsersList() {
@@ -2213,53 +2248,114 @@ function doPost(e) {
     }
 
     function renderBossAllLeads() {
+      renderPoolTable();
+    }
+
+    let selectedLeadIds = new Set();
+
+    function getPoolLeads() {
+      const f = (document.getElementById("poolFilter") || {}).value || "all";
+      return leads.filter(l => f === "all" || (f === "unassigned" && !l.callerId) || (f === "assigned" && !!l.callerId) || (f.startsWith("emp:") && l.callerId === f.slice(4)));
+    }
+
+    function refreshPoolControls() {
+      const fSel = document.getElementById("poolFilter"), eSel = document.getElementById("assignEmpSelect");
+      if (!fSel || !eSel) return;
+      const emps = users.filter(u => u.role === "employee");
+      const fv = fSel.value || "all", ev = eSel.value;
+      fSel.innerHTML = '<option value="all">All</option><option value="unassigned">Unassigned</option><option value="assigned">Assigned</option>' + emps.map(u => `<option value="emp:${u.id}">${escHtml(u.name)}</option>`).join("");
+      fSel.value = fv;
+      eSel.innerHTML = '<option value="">Employee chuno</option>' + emps.map(u => `<option value="${u.id}">${escHtml(u.name)}</option>`).join("");
+      eSel.value = ev;
+    }
+
+    function updatePoolSelCount() { document.getElementById("poolSelCount").innerText = selectedLeadIds.size + " selected"; }
+
+    function renderPoolTable() {
       const tbody = document.getElementById("bossLeadsTableBody");
-      tbody.innerHTML = "";
-      document.getElementById("bossLeadCount").innerText = `${leads.length} Leads`;
+      if (!tbody) return;
+      refreshPoolControls();
+      const list = getPoolLeads();
+      document.getElementById("bossLeadCount").innerText = `${list.length} of ${leads.length} Leads`;
+      document.getElementById("poolSelectAll").checked = list.length > 0 && list.every(l => selectedLeadIds.has(l.id));
+      updatePoolSelCount();
 
-      leads.forEach(l => {
-        const caller = users.find(u => u.id === l.callerId) || { name: "Auto-Assigned" };
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-50/70 transition";
-
-        const displayClient = l.clientName || l.company.split('(')[0].trim();
-        const displayCompany = l.companyName && l.companyName !== '-' 
-          ? l.companyName 
-          : (l.company.includes('(') ? l.company.split('(')[1].replace(')', '').trim() : '-');
-
-        const locationDisplay = l.state 
-          ? `${l.city || '-'}, ${l.state}` 
-          : (l.city || '-');
-
+      tbody.innerHTML = list.map(l => {
+        const displayClient = l.clientName || (l.company || "").split('(')[0].trim();
+        const displayCompany = l.companyName && l.companyName !== '-' ? l.companyName : ((l.company || "").includes('(') ? l.company.split('(')[1].replace(')', '').trim() : '-');
+        const loc = l.location || (l.state ? `${l.city || '-'}, ${l.state}` : (l.city || '-'));
         const estVal = Number(l.est) > 0 ? `₹${Number(l.est).toLocaleString('en-IN')}` : `<span class="text-slate-400 italic">Unquoted</span>`;
-
-        tr.innerHTML = `
+        const assigned = l.callerId ? escHtml((users.find(u => u.id === l.callerId) || { name: l.callerName || l.callerId }).name) : '<span class="text-amber-600 italic">Unassigned</span>';
+        const chatPrev = l.chat ? `<div class="text-[11px] text-slate-500 max-w-[200px] truncate">${escHtml(l.chat.slice(0, 40))}${l.chat.length > 40 ? '…' : ''}</div>` : '';
+        return `<tr class="hover:bg-slate-50/70 transition">
+          <td class="py-3 px-3"><input type="checkbox" class="cursor-pointer" ${selectedLeadIds.has(l.id) ? 'checked' : ''} onchange="toggleLeadSelect('${l.id}', this.checked)"></td>
           <td class="py-3 px-3 text-slate-500 whitespace-nowrap">${l.date}</td>
           <td class="py-3 px-3 font-bold text-slate-900 whitespace-nowrap">${l.brand}</td>
           <td class="py-3 px-3 text-slate-600 whitespace-nowrap"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${l.leadType === 'BuyLead' ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">${l.leadType || 'Enquiry'}</span></td>
-          <td class="py-3 px-3">
-            <div class="font-bold text-slate-900 leading-tight">${displayClient}</div>
-            <div class="text-[11px] text-slate-400 font-medium">${displayCompany !== '-' ? '🏢 ' + displayCompany : 'Individual Buyer'}</div>
-          </td>
-          <td class="py-3 px-3 whitespace-nowrap">
-            <div class="font-mono font-bold text-slate-900 text-xs">${l.phone}</div>
-            <div class="text-[10px] text-slate-400 truncate max-w-[130px]">${l.email && l.email !== '-' ? '✉️ ' + l.email : ''}</div>
-          </td>
-          <td class="py-3 px-3 text-slate-600 whitespace-nowrap">
-            <div class="font-medium text-slate-800">${locationDisplay}</div>
-            <div class="text-[10px] text-slate-400">${l.country && l.country !== 'India' ? l.country : ''}</div>
-          </td>
-          <td class="py-3 px-3 text-slate-700 font-medium max-w-xs truncate" title="${l.req}">${l.req}</td>
-          <td class="py-3 px-3 text-slate-700 font-semibold whitespace-nowrap">${caller.name}</td>
+          <td class="py-3 px-3"><div class="font-bold text-slate-900 leading-tight">${escHtml(displayClient)}</div><div class="text-[11px] text-slate-400 font-medium">${displayCompany !== '-' ? '🏢 ' + escHtml(displayCompany) : 'Individual Buyer'}</div></td>
+          <td class="py-3 px-3 whitespace-nowrap"><div class="font-mono font-bold text-slate-900 text-xs">${escHtml(l.phone)}</div><div class="text-[10px] text-slate-400 truncate max-w-[130px]">${l.email && l.email !== '-' ? '✉️ ' + escHtml(l.email) : ''}</div></td>
+          <td class="py-3 px-3 text-slate-600 whitespace-nowrap"><div class="font-medium text-slate-800">${escHtml(loc)}</div><div class="text-[10px] text-slate-400">${l.totalMessages ? escHtml(l.totalMessages) + ' msgs' : ''}</div></td>
+          <td class="py-3 px-3">${chatPrev}<button onclick="openChatModal('${l.id}')" class="mt-0.5 px-2 py-0.5 border border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded text-[11px] font-medium cursor-pointer">View Chat</button></td>
+          <td class="py-3 px-3 text-slate-700 font-medium max-w-xs truncate" title="${escHtml(l.req)}">${escHtml(l.req)}</td>
+          <td class="py-3 px-3 text-slate-700 font-semibold whitespace-nowrap">${assigned}</td>
           <td class="py-3 px-3 text-right font-bold text-slate-900 whitespace-nowrap">${estVal}</td>
-          <td class="py-3 px-3 whitespace-nowrap">
-            <span class="px-2 py-1 rounded-lg text-xs font-semibold border ${getStatusStyle(l.status)}">${l.status}</span>
-          </td>
+          <td class="py-3 px-3 whitespace-nowrap"><span class="px-2 py-1 rounded-lg text-xs font-semibold border ${getStatusStyle(l.status)}">${l.status}</span></td>
           <td class="py-3 px-3 text-center font-bold ${l.converted === 'Yes' ? 'text-emerald-600' : 'text-slate-400'}">${l.converted}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+        </tr>`;
+      }).join("");
     }
+
+    function toggleLeadSelect(id, on) { if (on) selectedLeadIds.add(id); else selectedLeadIds.delete(id); updatePoolSelCount(); }
+    function toggleSelectAll(on) { getPoolLeads().forEach(l => on ? selectedLeadIds.add(l.id) : selectedLeadIds.delete(l.id)); renderPoolTable(); }
+
+    function selectTopQty() {
+      const qty = parseInt(document.getElementById("assignQty").value, 10);
+      if (!qty || qty < 1) { alert("Pehle QTY daalo (jaise 50)."); return; }
+      const pick = getPoolLeads().filter(l => !l.callerId).slice(0, qty);
+      selectedLeadIds = new Set(pick.map(l => l.id));
+      renderPoolTable();
+      if (pick.length < qty) alert(`Sirf ${pick.length} unassigned leads mili (current filter me).`);
+    }
+
+    function assignSelected() {
+      const empId = document.getElementById("assignEmpSelect").value;
+      if (!selectedLeadIds.size) { alert("Pehle leads select karo."); return; }
+      if (!empId) { alert("Employee chuno."); return; }
+      const emp = users.find(u => u.id === empId);
+      const changed = [];
+      leads.forEach(l => { if (selectedLeadIds.has(l.id)) { l.callerId = empId; l.callerName = emp.name; l.assignedTo = empId; changed.push(l); } });
+      saveState();
+      selectedLeadIds.clear();
+      renderPoolTable();
+      alert(`${changed.length} leads assigned to ${emp.name}`);
+      (async () => { for (const l of changed) { await pushLeadToSheets(l); } })();
+    }
+
+    function parseChatMsg(raw) {
+      let m = String(raw).trim(), ts = "";
+      const r = m.match(/^\[?\s*(\d{1,4}[\/.\-]\d{1,2}[\/.\-]\d{1,4}),?\s*(\d{1,2}:\d{2}(?::\d{2})?\s*(?:[ap]\.?\s?m\.?)?)\s*\]?\s*[-–:]?\s*/i);
+      if (r) { ts = r[1] + ", " + r[2].trim(); m = m.slice(r[0].length); }
+      const mine = /^you\s*:/i.test(m);
+      return { ts, mine, text: m.replace(/^you\s*:\s*/i, "") };
+    }
+
+    function openChatModal(id) {
+      const l = leads.find(x => x.id === id);
+      if (!l) return;
+      if (currentUser.role !== "admin" && l.callerId !== currentUser.id) { alert("Ye lead aapko assign nahi hai."); return; }
+      document.getElementById("chatModalTitle").innerText = "💬 " + (l.phone || "Chat");
+      document.getElementById("chatModalSub").innerText = [l.location || l.city, l.totalMessages ? l.totalMessages + " messages" : ""].filter(Boolean).join(" • ");
+      const body = document.getElementById("chatModalBody");
+      const msgs = l.chat ? l.chat.split(" | ").filter(x => x.trim()) : [];
+      body.innerHTML = msgs.length ? msgs.map(raw => {
+        const c = parseChatMsg(raw);
+        const ts = c.ts ? `<div class="text-[10px] text-slate-500 ${c.mine ? 'text-right' : ''} mb-0.5">${escHtml(c.ts)}</div>` : '';
+        return `<div class="flex ${c.mine ? 'justify-end' : 'justify-start'}"><div style="max-width:80%">${ts}<div class="${c.mine ? 'bg-emerald-200' : 'bg-white'} rounded-lg px-3 py-2 text-xs text-slate-900 shadow-2xs" style="white-space:pre-wrap;word-break:break-word">${escHtml(c.text)}</div></div></div>`;
+      }).join("") : '<p class="text-center text-xs text-slate-500 py-6">Is lead ki chat available nahi hai.</p>';
+      const m = document.getElementById("chatModal"); m.classList.remove("hidden"); m.classList.add("flex");
+      body.scrollTop = 0;
+    }
+    function closeChatModal() { const m = document.getElementById("chatModal"); m.classList.add("hidden"); m.classList.remove("flex"); }
 
     function openWhatsAppModal(type) {
       const modal = document.getElementById("waModal");
